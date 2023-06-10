@@ -20,10 +20,9 @@ jobs:
           java-version: '11'
 
       - name: Set up Android SDK
-          uses: actions/setup-java@v3
-          with:
-            java-version: '11'
-            distribution: 'android'
+          uses: actions/setup-android@v3
+            with:
+              sdk-version: '33'
 
       - name: Build and test
         run: ./gradlew test
