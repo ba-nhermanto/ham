@@ -9,12 +9,12 @@ interface HeartrateDao {
     suspend fun getAll(): List<Heartrate>
 
     @Query("SELECT * FROM heartrates WHERE hrId IN (:id)")
-    suspend fun getById(id: Int): Heartrate
+    suspend fun getById(id: Int): Heartrate?
 
     @Query("SELECT * FROM heartrates WHERE hrId IN (:hrIds)")
     suspend fun loadAllByIds(hrIds: IntArray): List<Heartrate>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg heartrates: Heartrate)
 
     @Update
