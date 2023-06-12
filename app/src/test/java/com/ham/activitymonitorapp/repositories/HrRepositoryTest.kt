@@ -5,7 +5,8 @@ import com.ham.activitymonitorapp.data.entities.Heartrate
 import com.ham.activitymonitorapp.data.repositories.HeartrateRepository
 import com.ham.activitymonitorapp.exception.HrNotFoundException
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
