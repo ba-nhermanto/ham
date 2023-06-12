@@ -2,6 +2,7 @@ package com.ham.activitymonitorapp.data.repositories
 
 import com.ham.activitymonitorapp.data.dao.ExerciseDao
 import com.ham.activitymonitorapp.data.entities.Exercise
+import com.ham.activitymonitorapp.exception.ExerciseNotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -28,19 +29,27 @@ class ExerciseRepository @Inject constructor(
         exerciseDao.getById(id)
     }
 
-    suspend fun deleteExerciseById(exercise: Exercise) = withContext(Dispatchers.IO) {
-        exerciseDao.delete(exercise)
+    suspend fun getExercisesById(ids: IntArray): List<Exercise> = withContext(Dispatchers.IO) {
+        exerciseDao.loadAllByIds(ids)
     }
 
-    private suspend fun createExercise(exercise: Exercise) = withContext(Dispatchers.IO) {
+    suspend fun deleteExercise(exercise: Exercise) = withContext(Dispatchers.IO) {
+        if (getExerciseById(exercise.exerciseId) == null) {
+            throw ExerciseNotFoundException(exercise.exerciseId)
+        } else {
+            exerciseDao.delete(exercise)
+        }
+    }
+
+    suspend fun createExercise(exercise: Exercise) = withContext(Dispatchers.IO) {
         exerciseDao.insertAll(exercise)
     }
 
-    private suspend fun updateexercise(exercise: Exercise) = withContext(Dispatchers.IO) {
+    suspend fun updateExercise(exercise: Exercise) = withContext(Dispatchers.IO) {
         exerciseDao.updateExercises(exercise)
     }
 
-    suspend fun createOrUpdateexercise(exercise: Exercise) = withContext(Dispatchers.IO) {
+    suspend fun createOrUpdateExercise(exercise: Exercise) = withContext(Dispatchers.IO) {
         val existingexercise = getExerciseById(exercise.exerciseId)
 
         if (existingexercise == null) {
@@ -48,7 +57,7 @@ class ExerciseRepository @Inject constructor(
             createExercise(exercise)
         } else {
             // exercise already exists, update the existing exercise
-            updateexercise(exercise)
+            updateExercise(exercise)
         }
     }
 }

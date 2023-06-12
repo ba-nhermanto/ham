@@ -4,6 +4,7 @@ import com.ham.activitymonitorapp.data.dao.UserDao
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.relationship.UserAndExercise
 import com.ham.activitymonitorapp.data.relationship.UserAndHeartrate
+import com.ham.activitymonitorapp.exception.UserNotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,8 +31,12 @@ class UserRepository @Inject constructor(
         userDao.getById(id)
     }
 
-    suspend fun deleteUserById(user: User) = withContext(Dispatchers.IO) {
-        userDao.delete(user)
+    suspend fun deleteUser(user: User) = withContext(Dispatchers.IO) {
+        if (getUserById(user.userId) == null) {
+            throw UserNotFoundException(user.userId)
+        } else {
+            userDao.delete(user)
+        }
     }
 
     private suspend fun createUser(user: User) = withContext(Dispatchers.IO) {

@@ -60,6 +60,9 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1"
+    testImplementation "androidx.arch.core:core-testing:2.2.0"
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
@@ -120,6 +123,10 @@ dependencies {
     implementation "com.github.polarofficial:polar-ble-sdk:${sdk_version}"
     implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
+
+    // coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
+
 }
 
 kapt {
