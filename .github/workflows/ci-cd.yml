@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -26,11 +26,29 @@ jobs:
       - name: Unit test
         run: ./gradlew test
 
-      - name: Instrumented test
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Set up emulator
+          uses: reactivecircus/android-emulator-runner@v2
           with:
-            api-level: 33
-            script: ./gradlew connectedAndroidTest
+            api-level: 30
+            emulator-version: '30.8.4'
+            profile: ${{ runner.OS }}-google_apis_playstore
+
+      - name: Start emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          emulator-version: '30.8.4'
+          profile: ${{ runner.OS }}-google_apis_playstore
+          action: start
+
+      - name: Wait for emulator to start
+        uses: reactivecircus/android-wait-for-emulator@v2
+        with:
+          timeout: 300000
+
+
+      - name: Instrumented test
+        run: ./gradlew connectedAndroidTest
 
 
 
