@@ -10,10 +10,10 @@ import java.sql.Date
 @Entity(tableName = "users")
 data class User(
     @PrimaryKey(autoGenerate = true) val userId: Int,
-    @ColumnInfo(name = "username") val username: String,
-    @ColumnInfo(name = "weight") val weight: Int,
+    @ColumnInfo(name = "username") var username: String,
+    @ColumnInfo(name = "weight") var weight: Int,
     @TypeConverters(DateTypeConverter::class)
     @ColumnInfo(name = "dateOfBirth") val dateOfBirth: Date,
-    @ColumnInfo(name = "gender") val gender: Gender,
-    @ColumnInfo(name = "deviceId") val deviceId: String,
+    @ColumnInfo(name = "gender") var gender: Gender,
+    @ColumnInfo(name = "deviceId") var deviceId: String,
 )

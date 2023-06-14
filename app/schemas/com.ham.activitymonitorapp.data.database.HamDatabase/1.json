@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f7790a51f9c086930ab36a66f4cda4b3",
+    "identityHash": "45ecd44d829c5a31ef2ccce3055d7c65",
     "entities": [
       {
         "tableName": "users",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "exercises",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `startTime` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `averageHrBpm` INTEGER, `maxHrBpm` INTEGER, `minHrBpm` INTEGER, `caloriesBurned` INTEGER, `done` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exerciseId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `startTime` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `averageHrBpm` INTEGER, `maxHrBpm` INTEGER, `minHrBpm` INTEGER, `caloriesBurned` INTEGER, `done` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "exerciseId",
@@ -67,12 +67,6 @@
           {
             "fieldPath": "userId",
             "columnName": "userId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "weight",
-            "columnName": "weight",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -170,7 +164,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f7790a51f9c086930ab36a66f4cda4b3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '45ecd44d829c5a31ef2ccce3055d7c65')"
     ]
   }
 }

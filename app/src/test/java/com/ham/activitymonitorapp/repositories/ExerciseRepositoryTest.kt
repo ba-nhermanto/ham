@@ -163,7 +163,6 @@ class ExerciseRepositoryTest {
         return Exercise(
             exerciseId = EXERCISE_ID,
             userId = USER_ID,
-            weight = 80,
             startTime = Timestamp.valueOf("2023-06-12 20:45:00"),
             duration = 5,
             averageHrBpm = 120,
