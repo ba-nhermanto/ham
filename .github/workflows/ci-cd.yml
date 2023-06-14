@@ -27,11 +27,11 @@ jobs:
         run: ./gradlew test
 
       - name: Set up emulator
-          uses: reactivecircus/android-emulator-runner@v2
-          with:
-            api-level: 30
-            emulator-version: '30.8.4'
-            profile: ${{ runner.OS }}-google_apis_playstore
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          emulator-version: '30.8.4'
+          profile: ${{ runner.OS }}-google_apis_playstore
 
       - name: Start emulator
         uses: reactivecircus/android-emulator-runner@v2
