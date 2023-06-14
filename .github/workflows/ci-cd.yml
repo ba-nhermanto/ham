@@ -23,8 +23,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
-      - name: Build and test
+      - name: Unit test
         run: ./gradlew test
+
+      - name: Instrumented test
+        run: ./gradlew connectedAndroidTest
 
 
 

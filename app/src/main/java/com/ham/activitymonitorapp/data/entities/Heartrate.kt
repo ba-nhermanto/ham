@@ -11,7 +11,7 @@ import java.sql.Timestamp
 data class Heartrate(
     @PrimaryKey(autoGenerate = true) val hrId: Int,
     @ColumnInfo(name = "userId") val userId: Int,
-    @ColumnInfo(name = "bpm") val bpm: Int,
+    @ColumnInfo(name = "bpm") var bpm: Int,
     @TypeConverters(TimestampTypeConverter::class)
     @ColumnInfo(name = "timestamp") val timestamp: Timestamp,
 )

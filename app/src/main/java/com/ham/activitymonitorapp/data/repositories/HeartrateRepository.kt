@@ -10,6 +10,11 @@ import javax.inject.Inject
 class HeartrateRepository @Inject constructor(
     private val hrDao: HeartrateDao
 ){
+
+    suspend fun getAllHr(): List<Heartrate> = withContext(Dispatchers.IO) {
+        hrDao.getAll()
+    }
+
     suspend fun getHrById(id: Int): Heartrate? = withContext(Dispatchers.IO) {
         hrDao.getById(id)
     }
