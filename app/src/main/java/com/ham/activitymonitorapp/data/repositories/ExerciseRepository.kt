@@ -2,7 +2,7 @@ package com.ham.activitymonitorapp.data.repositories
 
 import com.ham.activitymonitorapp.data.dao.ExerciseDao
 import com.ham.activitymonitorapp.data.entities.Exercise
-import com.ham.activitymonitorapp.exception.ExerciseNotFoundException
+import com.ham.activitymonitorapp.exceptions.ExerciseNotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

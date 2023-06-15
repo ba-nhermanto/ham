@@ -3,7 +3,7 @@ package com.ham.activitymonitorapp.repositories
 import com.ham.activitymonitorapp.data.dao.ExerciseDao
 import com.ham.activitymonitorapp.data.entities.Exercise
 import com.ham.activitymonitorapp.data.repositories.ExerciseRepository
-import com.ham.activitymonitorapp.exception.ExerciseNotFoundException
+import com.ham.activitymonitorapp.exceptions.ExerciseNotFoundException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail

@@ -3,7 +3,7 @@ package com.ham.activitymonitorapp.repositories
 import com.ham.activitymonitorapp.data.dao.HeartrateDao
 import com.ham.activitymonitorapp.data.entities.Heartrate
 import com.ham.activitymonitorapp.data.repositories.HeartrateRepository
-import com.ham.activitymonitorapp.exception.HrNotFoundException
+import com.ham.activitymonitorapp.exceptions.HrNotFoundException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail

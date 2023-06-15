@@ -9,7 +9,7 @@ import java.sql.Timestamp
 
 @Entity(tableName = "exercises")
 data class Exercise(
-    @PrimaryKey(autoGenerate = true) val exerciseId: Int,
+    @PrimaryKey(autoGenerate = true) val exerciseId: Int = 0,
     @ColumnInfo(name = "userId") val userId: Int,
     @TypeConverters(DateTypeConverter::class)
     @ColumnInfo(name = "startTime") val startTime: Timestamp,

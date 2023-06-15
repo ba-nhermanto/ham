@@ -9,7 +9,7 @@ import java.sql.Date
 
 @Entity(tableName = "users")
 data class User(
-    @PrimaryKey(autoGenerate = true) val userId: Int,
+    @PrimaryKey(autoGenerate = true) val userId: Int = 0,
     @ColumnInfo(name = "username") var username: String,
     @ColumnInfo(name = "weight") var weight: Int,
     @TypeConverters(DateTypeConverter::class)
