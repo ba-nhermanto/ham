@@ -2,7 +2,7 @@ package com.ham.activitymonitorapp.data.repositories
 
 import com.ham.activitymonitorapp.data.dao.HeartrateDao
 import com.ham.activitymonitorapp.data.entities.Heartrate
-import com.ham.activitymonitorapp.exception.HrNotFoundException
+import com.ham.activitymonitorapp.exceptions.HrNotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

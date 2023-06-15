@@ -4,7 +4,7 @@ import com.ham.activitymonitorapp.data.dao.UserDao
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.relationship.UserAndExercise
 import com.ham.activitymonitorapp.data.relationship.UserAndHeartrate
-import com.ham.activitymonitorapp.exception.UserNotFoundException
+import com.ham.activitymonitorapp.exceptions.UserNotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

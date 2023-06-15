@@ -6,7 +6,7 @@ import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.relationship.UserAndExercise
 import com.ham.activitymonitorapp.data.relationship.UserAndHeartrate
 import com.ham.activitymonitorapp.data.repositories.UserRepository
-import com.ham.activitymonitorapp.exception.UserNotFoundException
+import com.ham.activitymonitorapp.exceptions.UserNotFoundException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
