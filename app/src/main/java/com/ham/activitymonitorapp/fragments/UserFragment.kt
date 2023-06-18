@@ -93,7 +93,7 @@ class UserFragment: Fragment(R.layout.user_fragment) {
         runBlocking {
             userViewModel.upsertUser(user)
         }
-        showToast("User with userId ${binding.activeUser.userId} is saved")
+        showToast("User with userId ${binding.activeUser?.userId} is saved")
     }
 
     private fun observeActiveUser() {

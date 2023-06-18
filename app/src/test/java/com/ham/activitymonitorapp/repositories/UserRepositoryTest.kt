@@ -192,7 +192,7 @@ class UserRepositoryTest {
         // Assert
         assertEquals(activeUser, user)
         verify(userDao).setActiveUser(USER_ID)
-        verify(userDao).getActiveUser()
+        verify(userDao, times(2)).getActiveUser()
     }
 
     private fun supplyUser(): User {
