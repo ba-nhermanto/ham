@@ -9,4 +9,18 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="home">Home</string>
+    <string name="exercises">Exercises</string>
+    <string name="profile">Profile</string>
+    <string name="completed_exercises">Completed Exercises</string>
+    <string name="users">Users</string>
+    <string name="username">username</string>
+    <string name="name">Name</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="weight">Weight</string>
+    <string name="gender">Gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="device_id">Device Id</string>
+    <string name="save_user">Save User</string>
 </resources>

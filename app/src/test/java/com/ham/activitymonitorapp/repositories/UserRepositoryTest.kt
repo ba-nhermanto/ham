@@ -27,7 +27,7 @@ class UserRepositoryTest {
 
     private lateinit var userRepository: UserRepository
 
-    private val USER_ID = 1
+    private val USER_ID = 1L
 
     @Before
     fun setup() {
@@ -50,20 +50,6 @@ class UserRepositoryTest {
         verify(userDao).getAll()
     }
 
-    @Test
-    fun `test setActiveUser`() = runTest {
-        // Setup
-        val user = supplyUser()
-        `when`(userDao.getById(USER_ID)).thenReturn(user)
-
-        // Act
-        val result = userRepository.setActiveUser(USER_ID)
-
-        // Assert
-        assertEquals(user, result)
-        assertEquals(user, userRepository.getActiveUser())
-        verify(userDao).getById(USER_ID)
-    }
 
     @Test
     fun `test getUserById() function`(): Unit =  runTest {
@@ -164,35 +150,49 @@ class UserRepositoryTest {
     @Test
     fun `test getUserAndExercises`() = runTest {
         // Setup
-        val userId = 1
         val userAndExercises = listOf(
             UserAndExercise(user = supplyUser(), exercises = emptyList())
         )
-        `when`(userDao.getUserAndExercises(userId)).thenReturn(userAndExercises)
+        `when`(userDao.getUserAndExercises(USER_ID)).thenReturn(userAndExercises)
 
         // Act
-        val result = userRepository.getUserAndExercises(userId)
+        val result = userRepository.getUserAndExercises(USER_ID)
 
         // Assert
         assertEquals(userAndExercises, result)
-        verify(userDao).getUserAndExercises(userId)
+        verify(userDao).getUserAndExercises(USER_ID)
     }
 
     @Test
     fun `test getUserAndHrs`() = runTest {
         // Setup
-        val userId = 1
         val userAndHeartrates = listOf(
             UserAndHeartrate(user = supplyUser(), heartrates = emptyList())
         )
-        `when`(userDao.getUserAndHeartrates(userId)).thenReturn(userAndHeartrates)
+        `when`(userDao.getUserAndHeartrates(USER_ID)).thenReturn(userAndHeartrates)
 
         // Act
-        val result = userRepository.getUserAndHrs(userId)
+        val result = userRepository.getUserAndHrs(USER_ID)
 
         // Assert
         assertEquals(userAndHeartrates, result)
-        verify(userDao).getUserAndHeartrates(userId)
+        verify(userDao).getUserAndHeartrates(USER_ID)
+    }
+
+    @Test
+    fun `test setUserActiveThenGetActiveUser`() = runTest {
+        // Setup
+        val user = supplyUser()
+        `when`(userDao.getActiveUser()).thenReturn(user)
+
+        // Act
+        userRepository.setActiveUser(USER_ID)
+        val activeUser = userRepository.getActiveUser()
+
+        // Assert
+        assertEquals(activeUser, user)
+        verify(userDao).setActiveUser(USER_ID)
+        verify(userDao).getActiveUser()
     }
 
     private fun supplyUser(): User {

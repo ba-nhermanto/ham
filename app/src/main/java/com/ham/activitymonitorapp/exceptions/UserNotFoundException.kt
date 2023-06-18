@@ -1,3 +1,3 @@
 package com.ham.activitymonitorapp.exceptions
 
-class UserNotFoundException(userId: Int) : Exception("User with userId $userId not found")
+class UserNotFoundException(userId: Long) : Exception("User with userId $userId not found")

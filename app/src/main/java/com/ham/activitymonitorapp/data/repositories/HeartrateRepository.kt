@@ -15,11 +15,11 @@ class HeartrateRepository @Inject constructor(
         hrDao.getAll()
     }
     
-    suspend fun getHrById(id: Int): Heartrate? = withContext(Dispatchers.IO) {
+    suspend fun getHrById(id: Long): Heartrate? = withContext(Dispatchers.IO) {
         hrDao.getById(id)
     }
 
-    suspend fun getAllHrById(ids: IntArray): List<Heartrate> = withContext(Dispatchers.IO) {
+    suspend fun getAllHrById(ids: LongArray): List<Heartrate> = withContext(Dispatchers.IO) {
         hrDao.loadAllByIds(ids)
     }
 

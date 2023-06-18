@@ -63,7 +63,7 @@ class HeartrateRepositoryInstrumentedTest {
         // Arrange
         val heartrates = supplyListOfHr()
         heartrates.forEach { heartrateRepository.save(it) }
-        val hrIds = heartrates.map { it.hrId }.toIntArray()
+        val hrIds = heartrates.map { it.hrId }.toLongArray()
 
         // Act
         val result = heartrateRepository.getAllHrById(hrIds)
@@ -106,8 +106,8 @@ class HeartrateRepositoryInstrumentedTest {
 
     private fun supplyHr(): Heartrate {
         return Heartrate(
-            hrId = 1,
-            userId = 1,
+            hrId = 1L,
+            userId = 1L,
             bpm = 80,
             timestamp = Timestamp.valueOf("2023-06-15 20:45:00"),
         )
@@ -117,14 +117,14 @@ class HeartrateRepositoryInstrumentedTest {
         return listOf(
             supplyHr(),
             Heartrate(
-                hrId = 2,
-                userId = 1,
+                hrId = 2L,
+                userId = 1L,
                 bpm = 70,
                 timestamp = Timestamp.valueOf("2023-06-13 20:45:00"),
             ),
             Heartrate(
-                hrId = 3,
-                userId = 1,
+                hrId = 3L,
+                userId = 1L,
                 bpm = 87,
                 timestamp = Timestamp.valueOf("2023-06-14 20:45:00"),
             )

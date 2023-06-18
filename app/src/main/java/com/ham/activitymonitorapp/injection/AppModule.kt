@@ -1,9 +1,7 @@
 package com.ham.activitymonitorapp.injection
 
 import android.content.Context
-import androidx.room.Room
 import com.ham.activitymonitorapp.data.database.HamDatabase
-import com.ham.activitymonitorapp.other.Constants.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,11 +17,7 @@ class AppModule {
     @Provides
     fun provideDatabase(
         @ApplicationContext app: Context
-    ) = Room.databaseBuilder(
-        app,
-        HamDatabase::class.java,
-        DATABASE_NAME
-    ).build()
+    ) = HamDatabase.getInstance(app)
 
     @Singleton
     @Provides

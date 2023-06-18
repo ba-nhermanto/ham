@@ -1,5 +1,6 @@
 package com.ham.activitymonitorapp.data.repositories
 
+import androidx.room.Transaction
 import com.ham.activitymonitorapp.data.dao.UserDao
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.relationship.UserAndExercise
@@ -12,22 +13,26 @@ import javax.inject.Inject
 class UserRepository @Inject constructor(
     private val userDao: UserDao
 ){
-    private lateinit var activeUser: User
-
-    fun getActiveUser(): User {
-        return activeUser
+    suspend fun getActiveUser(): User = withContext(Dispatchers.IO) {
+        userDao.getActiveUser()
     }
 
     suspend fun getUsers(): List<User> = withContext(Dispatchers.IO) {
         userDao.getAll()
     }
 
-    suspend fun setActiveUser(id: Int): User = withContext(Dispatchers.IO) {
-        activeUser = userDao.getById(id)!!
-        activeUser
+    @Transaction
+    suspend fun setActiveUser(id: Long): User = withContext(Dispatchers.IO) {
+        setAllUserInactive()
+        userDao.setActiveUser(id)
+        getActiveUser()
     }
 
-    suspend fun getUserById(id: Int): User? = withContext(Dispatchers.IO) {
+    private suspend fun setAllUserInactive() = withContext(Dispatchers.IO) {
+        userDao.setAllUserInactive()
+    }
+
+    suspend fun getUserById(id: Long): User? = withContext(Dispatchers.IO) {
         userDao.getById(id)
     }
 
@@ -57,11 +62,16 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getUserAndExercises(id: Int): List<UserAndExercise> = withContext(Dispatchers.IO) {
+    suspend fun upsertUser(user: User): User? = withContext(Dispatchers.IO) {
+        val userId = userDao.insert(user)
+        getUserById(userId)
+    }
+
+    suspend fun getUserAndExercises(id: Long): List<UserAndExercise> = withContext(Dispatchers.IO) {
         userDao.getUserAndExercises(id)
     }
 
-    suspend fun getUserAndHrs(id: Int): List<UserAndHeartrate> = withContext(Dispatchers.IO) {
+    suspend fun getUserAndHrs(id: Long): List<UserAndHeartrate> = withContext(Dispatchers.IO) {
         userDao.getUserAndHeartrates(id)
     }
 }

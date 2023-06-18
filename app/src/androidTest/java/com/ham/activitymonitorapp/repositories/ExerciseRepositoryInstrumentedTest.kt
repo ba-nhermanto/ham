@@ -20,8 +20,8 @@ class ExerciseRepositoryInstrumentedTest {
     private lateinit var exerciseRepository: ExerciseRepository
     private lateinit var database: HamDatabase
 
-    private val USER_ID = 1
-    private val EXERCISE_ID = 1
+    private val USER_ID = 1L
+    private val EXERCISE_ID = 1L
 
     @Before
     fun setup() {
@@ -91,7 +91,7 @@ class ExerciseRepositoryInstrumentedTest {
         // Setup
         val exercises = supplyListOfExercise()
         exercises.forEach { exerciseRepository.createExercise(it) }
-        val exerciseIds = exercises.map { it.exerciseId }.toIntArray()
+        val exerciseIds = exercises.map { it.exerciseId }.toLongArray()
 
         // Act
         val result = exerciseRepository.getExercisesById(exerciseIds)

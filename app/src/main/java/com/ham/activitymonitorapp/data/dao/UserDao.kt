@@ -11,13 +11,18 @@ interface UserDao {
     suspend fun getAll(): List<User>
 
     @Query("SELECT * FROM users WHERE userId = :userId")
-    suspend fun getById(userId: Int): User?
+    suspend fun getById(userId: Long): User?
 
     @Query("SELECT * FROM users WHERE userId IN (:userIds)")
-    suspend fun loadAllByIds(userIds: IntArray): List<User>
+    suspend fun loadAllByIds(userIds: LongArray): List<User>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Transaction
     suspend fun insertAll(vararg users: User)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Transaction
+    suspend fun insert(user: User): Long
 
     @Delete
     suspend fun delete(user: User)
@@ -27,10 +32,22 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM users WHERE userId = :userId")
-    suspend fun getUserAndExercises(userId: Int): List<UserAndExercise>
+    suspend fun getUserAndExercises(userId: Long): List<UserAndExercise>
 
     @Transaction
     @Query("SELECT * FROM users WHERE userId = :userId")
-    suspend fun getUserAndHeartrates(userId: Int): List<UserAndHeartrate>
+    suspend fun getUserAndHeartrates(userId: Long): List<UserAndHeartrate>
+
+    @Query("SELECT * FROM users WHERE active = 1")
+    suspend fun getActiveUser(): User
+
+    @Query("UPDATE users " +
+            "SET active = 0 ")
+    suspend fun setAllUserInactive()
+
+    @Query("UPDATE users " +
+            "SET active = 1 " +
+            "WHERE userId = :userId")
+    suspend fun setActiveUser(userId: Long)
 
 }

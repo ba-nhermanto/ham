@@ -23,7 +23,7 @@ class UserRepositoryInstrumentedTest {
     private lateinit var userRepository: UserRepository
     private lateinit var database: HamDatabase
 
-    private val USER_ID = 1
+    private val USER_ID = 1L
     private val DEVICE_ID = "DEVICE_ID"
 
     @Before
