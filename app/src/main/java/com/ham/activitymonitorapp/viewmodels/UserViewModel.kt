@@ -2,6 +2,7 @@ package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -35,6 +36,7 @@ class UserViewModel @Inject constructor(
     suspend fun setActiveUser(userId: Long) {
         try {
             activeUser.value = userRepository.setActiveUser(userId)
+            showToast("User $userId is active")
         } catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -46,6 +48,7 @@ class UserViewModel @Inject constructor(
             if (upserted != null) {
                 setActiveUser(upserted.userId)
                 bufferUser.value = upserted
+                showToast("User ${upserted.userId} is saved")
             } else {
                 Log.e(TAG, "failed to upsert user $user")
             }
@@ -63,5 +66,9 @@ class UserViewModel @Inject constructor(
 
     suspend fun getActiveUser(): User {
         return userRepository.getActiveUser()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show()
     }
 }
