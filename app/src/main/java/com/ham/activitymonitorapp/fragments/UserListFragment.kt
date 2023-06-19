@@ -16,6 +16,7 @@ import com.ham.activitymonitorapp.databinding.UserListFragmentBinding
 import com.ham.activitymonitorapp.view.UserAdapter
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class UserListFragment: Fragment(R.layout.user_list_fragment) {
@@ -59,7 +60,11 @@ class UserListFragment: Fragment(R.layout.user_list_fragment) {
     }
 
     private fun initRecyclerView(userList: List<User>) {
-        userAdapter = UserAdapter(userList)
+        userAdapter = UserAdapter(userList) { user, _ ->
+            runBlocking {
+                userViewModel.setActiveUser(user.userId)
+            }
+        }
         recyclerView = binding.recyclerViewUsers
 
         recyclerView.apply {

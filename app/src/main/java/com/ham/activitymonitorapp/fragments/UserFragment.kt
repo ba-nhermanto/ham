@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -93,7 +92,6 @@ class UserFragment: Fragment(R.layout.user_fragment) {
         runBlocking {
             userViewModel.upsertUser(user)
         }
-        showToast("User with userId ${binding.activeUser?.userId} is saved")
     }
 
     private fun observeActiveUser() {
@@ -103,9 +101,5 @@ class UserFragment: Fragment(R.layout.user_fragment) {
             this.activeUser = user
         }
 
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 }

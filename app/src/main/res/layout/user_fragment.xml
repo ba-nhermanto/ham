@@ -59,12 +59,21 @@
                 app:layout_constraintTop_toBottomOf="@+id/profile" />
 
             <TextView
+                android:id="@+id/textViewId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/id"
+                app:layout_constraintBottom_toTopOf="@+id/name"
+                app:layout_constraintStart_toStartOf="@+id/name" />
+
+            <TextView
                 android:id="@+id/textViewUserId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{String.valueOf(activeUser.userId)}"
                 app:layout_constraintBottom_toTopOf="@+id/name"
-                app:layout_constraintStart_toStartOf="@+id/name" />
+                app:layout_constraintStart_toEndOf="@+id/textViewId"
+             />
 
             <TextView
                 android:id="@+id/name"
