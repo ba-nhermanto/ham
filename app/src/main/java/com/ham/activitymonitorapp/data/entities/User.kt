@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.ham.activitymonitorapp.data.typeconverters.DateTypeConverter
 import java.sql.Date
+import java.time.LocalDate
+import java.time.Period
 
 @Entity(tableName = "users")
 data class User(
@@ -17,4 +19,10 @@ data class User(
     @ColumnInfo(name = "gender") var gender: Gender,
     @ColumnInfo(name = "deviceId") var deviceId: String,
     @ColumnInfo(name = "active") var active: Boolean = false
-)
+) {
+    fun getAge(): Int {
+        val currentDate = LocalDate.now()
+        val dob = LocalDate.parse(dateOfBirth.toString())
+        return Period.between(dob, currentDate).years
+    }
+}

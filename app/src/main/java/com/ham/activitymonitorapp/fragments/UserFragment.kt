@@ -1,5 +1,6 @@
 package com.ham.activitymonitorapp.fragments
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +17,8 @@ import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import java.sql.Date
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -42,6 +45,7 @@ class UserFragment: Fragment(R.layout.user_fragment) {
 
         handleButtonUserListOnClick()
         handleButtonSaveUser()
+        handleDatePicker()
 
         this.activeUser = runBlocking{
             userViewModel.getActiveUser()
@@ -101,5 +105,27 @@ class UserFragment: Fragment(R.layout.user_fragment) {
             this.activeUser = user
         }
 
+    }
+
+    private fun handleDatePicker() {
+        val calendar = Calendar.getInstance()
+
+        binding.editTextUserDob.setOnClickListener {
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedDate = Calendar.getInstance()
+                selectedDate.set(selectedYear, selectedMonth, selectedDay)
+
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val formattedDate = dateFormat.format(selectedDate.time)
+
+                binding.editTextUserDob.setText(formattedDate)
+            }, year, month, day)
+
+            datePickerDialog.show()
+        }
     }
 }
