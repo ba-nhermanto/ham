@@ -9,8 +9,8 @@ import java.sql.Timestamp
 
 @Entity(tableName = "heartrates")
 data class Heartrate(
-    @PrimaryKey(autoGenerate = true) val hrId: Int = 0,
-    @ColumnInfo(name = "userId") val userId: Int,
+    @PrimaryKey(autoGenerate = true) val hrId: Long = 0,
+    @ColumnInfo(name = "userId") val userId: Long,
     @ColumnInfo(name = "bpm") var bpm: Int,
     @TypeConverters(TimestampTypeConverter::class)
     @ColumnInfo(name = "timestamp") val timestamp: Timestamp,

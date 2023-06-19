@@ -9,11 +9,12 @@ import java.sql.Date
 
 @Entity(tableName = "users")
 data class User(
-    @PrimaryKey(autoGenerate = true) val userId: Int = 0,
+    @PrimaryKey(autoGenerate = true) val userId: Long = 0,
     @ColumnInfo(name = "username") var username: String,
     @ColumnInfo(name = "weight") var weight: Int,
     @TypeConverters(DateTypeConverter::class)
     @ColumnInfo(name = "dateOfBirth") val dateOfBirth: Date,
     @ColumnInfo(name = "gender") var gender: Gender,
     @ColumnInfo(name = "deviceId") var deviceId: String,
+    @ColumnInfo(name = "active") var active: Boolean = false
 )

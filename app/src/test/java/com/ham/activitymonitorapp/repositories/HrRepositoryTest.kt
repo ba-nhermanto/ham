@@ -24,8 +24,8 @@ class HrRepositoryTest {
 
     private lateinit var hrRepository: HeartrateRepository
 
-    private val USER_ID = 1
-    private val HR_ID = 1
+    private val USER_ID = 1L
+    private val HR_ID = 1L
 
     @Before
     fun setup() {
@@ -51,14 +51,14 @@ class HrRepositoryTest {
     fun `test getAllHrById`() = runTest {
         // Setup
         val hr = supplyHr()
-        `when`(hrDao.loadAllByIds(IntArray(HR_ID))).thenReturn(listOf(hr))
+        `when`(hrDao.loadAllByIds(LongArray(HR_ID.toInt()))).thenReturn(listOf(hr))
 
         // Act
-        val result = hrRepository.getAllHrById(IntArray(HR_ID))
+        val result = hrRepository.getAllHrById(LongArray(HR_ID.toInt()))
 
         // Assert
         assertEquals(listOf(hr), result)
-        verify(hrDao).loadAllByIds(IntArray(HR_ID))
+        verify(hrDao).loadAllByIds(LongArray(HR_ID.toInt()))
     }
 
     @Test

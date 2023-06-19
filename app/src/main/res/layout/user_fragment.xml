@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="activeUser"
+            type="com.ham.activitymonitorapp.data.entities.User" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Profile"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@{activeUser.username}"
+                android:textSize="32sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/avatar_text" />
+
+            <TextView
+                android:id="@+id/avatar_text"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="64dp"
+                android:background="@drawable/rounded_corner"
+                android:fontFamily="sans-serif"
+                android:gravity="center_vertical|center_horizontal"
+                android:maxLines="1"
+                app:substringText="@{activeUser.username}"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profile" />
+
+            <TextView
+                android:id="@+id/textViewUserId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(activeUser.userId)}"
+                app:layout_constraintBottom_toTopOf="@+id/name"
+                app:layout_constraintStart_toStartOf="@+id/name" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/name"
+                app:layout_constraintBottom_toTopOf="@+id/editTextUserName"
+                app:layout_constraintStart_toStartOf="@+id/editTextUserName" />
+
+            <EditText
+                android:id="@+id/editTextUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="@{activeUser.username}"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/username" />
+
+            <TextView
+                android:id="@+id/dob"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/date_of_birth"
+                app:layout_constraintStart_toStartOf="@+id/editTextUserName"
+                app:layout_constraintTop_toBottomOf="@+id/editTextUserName" />
+
+            <EditText
+                android:id="@+id/editTextUserDob"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="date"
+                android:text="@{activeUser.dateOfBirth.toString()}"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/dob"
+                app:layout_constraintTop_toBottomOf="@+id/dob" />
+
+            <TextView
+                android:id="@+id/weight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/weight"
+                app:layout_constraintStart_toStartOf="@+id/editTextUserDob"
+                app:layout_constraintTop_toBottomOf="@+id/editTextUserDob" />
+
+            <EditText
+                android:id="@+id/editTextUserWeight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="@{String.valueOf(activeUser.weight)}"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/weight"
+                app:layout_constraintTop_toBottomOf="@+id/weight" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gender"
+                app:layout_constraintStart_toStartOf="@+id/editTextUserWeight"
+                app:layout_constraintTop_toBottomOf="@+id/editTextUserWeight" />
+
+
+            <RadioGroup
+                android:id="@+id/radioGroupGender"
+                android:layout_width="212dp"
+                android:layout_height="39dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="@+id/textView"
+                app:layout_constraintTop_toBottomOf="@+id/textView">
+
+                <RadioButton
+                    android:id="@+id/radioButtonMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/male"
+                    android:textSize="11sp"
+                    android:layout_marginEnd="16dp"
+                    />
+
+                <RadioButton
+                    android:id="@+id/radioButtonFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/female"
+                    android:textSize="11sp"
+                    android:layout_marginStart="16dp"/>
+
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/deviceid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/device_id"
+                app:layout_constraintStart_toStartOf="@+id/radioGroupGender"
+                app:layout_constraintTop_toBottomOf="@+id/radioGroupGender" />
+
+            <EditText
+                android:id="@+id/editTextUserDeviceId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"
+                android:text="@{activeUser.deviceId}"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/deviceid"
+                app:layout_constraintTop_toBottomOf="@+id/deviceid" />
+
+            <Button
+                android:id="@+id/buttonSaveUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="@string/save_user"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="@+id/editTextUserDeviceId"
+                app:layout_constraintTop_toBottomOf="@+id/editTextUserDeviceId" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGoToUserList"
+                style="@style/NoShadowButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:backgroundTint="@android:color/transparent"
+                android:elevation="0dp"
+                android:gravity="center|center_vertical"
+                android:padding="8dp"
+                app:icon="@drawable/baseline_groups_12"
+                app:iconGravity="start"
+                app:iconPadding="4dp"
+                app:iconTint="@color/teal_200"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</layout>

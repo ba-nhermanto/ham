@@ -24,8 +24,8 @@ class ExerciseRepositoryTest {
 
     private lateinit var exerciseRepository: ExerciseRepository
 
-    private val USER_ID = 1
-    private val EXERCISE_ID = 1
+    private val USER_ID = 1L
+    private val EXERCISE_ID = 1L
 
     @Before
     fun setup() {
@@ -52,14 +52,14 @@ class ExerciseRepositoryTest {
     fun `test getAllExercises`() = runTest {
         // Setup
         val exercise = supplyExercise()
-        `when`(exerciseDao.loadAllByIds(IntArray(EXERCISE_ID))).thenReturn(listOf(exercise))
+        `when`(exerciseDao.loadAllByIds(LongArray(EXERCISE_ID.toInt()))).thenReturn(listOf(exercise))
 
         // Act
-        val result = exerciseRepository.getExercisesById(IntArray(EXERCISE_ID))
+        val result = exerciseRepository.getExercisesById(LongArray(EXERCISE_ID.toInt()))
 
         // Assert
         assertEquals(listOf(exercise), result)
-        verify(exerciseDao).loadAllByIds(IntArray(EXERCISE_ID))
+        verify(exerciseDao).loadAllByIds(LongArray(EXERCISE_ID.toInt()))
     }
 
     @Test
@@ -115,7 +115,7 @@ class ExerciseRepositoryTest {
     }
 
     @Test
-    fun `test createOrUpdateUser when user exists`() = runTest {
+    fun `test createOrUpdateUser when Exercise exists`() = runTest {
         // Setup
         val exercise = supplyExercise()
         `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(exercise)
@@ -126,6 +126,19 @@ class ExerciseRepositoryTest {
         // Assert
         verify(exerciseDao).updateExercises(exercise)
     }
+
+    @Test
+    fun `test upsert`() = runTest {
+        // Setup
+        val exercise = supplyExercise()
+
+        // Act
+        exerciseRepository.upsertExercise(exercise)
+
+        // Assert
+        verify(exerciseDao).insert(exercise)
+    }
+
 
     @Test
     fun `test delete exercise not found`() = runTest {

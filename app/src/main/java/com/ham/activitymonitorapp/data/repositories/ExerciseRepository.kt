@@ -20,16 +20,16 @@ class ExerciseRepository @Inject constructor(
         exerciseDao.getAll()
     }
 
-    suspend fun setActiveExercise(id: Int): Exercise = withContext(Dispatchers.IO) {
+    suspend fun setActiveExercise(id: Long): Exercise = withContext(Dispatchers.IO) {
         activeExercise = exerciseDao.getById(id)!!
         activeExercise
     }
 
-    suspend fun getExerciseById(id: Int): Exercise? = withContext(Dispatchers.IO) {
+    suspend fun getExerciseById(id: Long): Exercise? = withContext(Dispatchers.IO) {
         exerciseDao.getById(id)
     }
 
-    suspend fun getExercisesById(ids: IntArray): List<Exercise> = withContext(Dispatchers.IO) {
+    suspend fun getExercisesById(ids: LongArray): List<Exercise> = withContext(Dispatchers.IO) {
         exerciseDao.loadAllByIds(ids)
     }
 
@@ -47,6 +47,10 @@ class ExerciseRepository @Inject constructor(
 
     suspend fun updateExercise(exercise: Exercise) = withContext(Dispatchers.IO) {
         exerciseDao.updateExercises(exercise)
+    }
+
+    suspend fun upsertExercise(exercise: Exercise): Long = withContext(Dispatchers.IO) {
+        exerciseDao.insert(exercise)
     }
 
     suspend fun createOrUpdateExercise(exercise: Exercise) = withContext(Dispatchers.IO) {
