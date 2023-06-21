@@ -47,8 +47,6 @@ class ConnectionService : Service() {
 
     private lateinit var deviceId: String
 
-    private var autoConnectDisposable: Disposable? = null
-
     private val binder = ConnectionServiceBinder()
 
     inner class ConnectionServiceBinder : Binder() {
@@ -56,7 +54,6 @@ class ConnectionService : Service() {
     }
 
     override fun onBind(intent: Intent): IBinder {
-        deviceId = intent.getStringExtra("deviceId").toString()
 
         return binder
     }
@@ -70,6 +67,9 @@ class ConnectionService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(SERVICE_ID, notification())
+        if (intent != null) {
+            deviceId = intent.getStringExtra("deviceId").toString()
+        }
 
         appContext = baseContext
         connectPolar(deviceId)
@@ -153,29 +153,12 @@ class ConnectionService : Service() {
         })
     }
 
-    fun autoConnect() {
-        autoConnectDisposable = polarBleApi.autoConnectToDevice(-60, "180D", null)
-            .subscribe(
-                { Log.d(TAG, "auto connect search complete") },
-                { throwable: Throwable -> Log.e(TAG, "" + throwable.toString()) }
-            )
-    }
-
-    fun connectOrDisconnect() {
+    private fun disconnect() {
         try {
-            if (deviceConnected) {
-                polarBleApi.disconnectFromDevice(deviceId)
-                deviceConnected = false
-            } else {
-                polarBleApi.connectToDevice(deviceId)
-            }
+            polarBleApi.disconnectFromDevice(deviceId)
+            deviceConnected = false
         } catch (polarInvalidArgument: PolarInvalidArgument) {
-            val attempt = if (deviceConnected) {
-                "disconnect"
-            } else {
-                "connect"
-            }
-            Log.e(TAG, "Failed to $attempt. Reason $polarInvalidArgument ")
+            Log.e(TAG, "Failed to disconnect. Reason $polarInvalidArgument ")
         }
     }
 
@@ -221,11 +204,13 @@ class ConnectionService : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
+        disconnect()
         polarBleApi.shutDown()
         stopSelf()
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        disconnect()
         polarBleApi.shutDown()
         return super.onUnbind(intent)
     }

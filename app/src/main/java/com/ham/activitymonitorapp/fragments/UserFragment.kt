@@ -1,5 +1,6 @@
 package com.ham.activitymonitorapp.fragments
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,10 +13,13 @@ import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.Gender
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.UserFragmentBinding
+import com.ham.activitymonitorapp.other.Constants.DEFAULT_DATE
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import java.sql.Date
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -25,6 +29,10 @@ class UserFragment: Fragment(R.layout.user_fragment) {
     private var _binding: UserFragmentBinding? = null
     private val binding get() = _binding!!
     private var activeUser: User? = null
+
+    companion object {
+        const val TAG = "USER_FRAGMENT"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +50,7 @@ class UserFragment: Fragment(R.layout.user_fragment) {
 
         handleButtonUserListOnClick()
         handleButtonSaveUser()
+        handleDatePicker()
 
         this.activeUser = runBlocking{
             userViewModel.getActiveUser()
@@ -65,7 +74,12 @@ class UserFragment: Fragment(R.layout.user_fragment) {
     private fun saveUser() {
         val id = binding.textViewUserId.text.toString().toLong()
         val name: String = binding.editTextUserName.text.toString().trim()
-        val dob: Date = Date.valueOf(binding.editTextUserDob.text.toString().trim())
+        val dob: Date = try {
+            Date.valueOf(binding.editTextUserDob.text.toString().trim())
+        } catch (e: Exception) {
+            Log.e(TAG, e.message.toString())
+            Date.valueOf(DEFAULT_DATE)
+        }
         val gender: Gender = if (binding.radioButtonMale.isChecked) Gender.MALE else Gender.FEMALE
         val weight: Int = binding.editTextUserWeight.text.toString().trim().toInt()
         val deviceId: String = binding.editTextUserDeviceId.text.toString().trim()
@@ -96,10 +110,32 @@ class UserFragment: Fragment(R.layout.user_fragment) {
 
     private fun observeActiveUser() {
         userViewModel.activeUser.observe(viewLifecycleOwner) { user ->
-            Log.d(tag, user.toString())
+            Log.d(TAG, user.toString())
             binding.activeUser = user
             this.activeUser = user
         }
 
+    }
+
+    private fun handleDatePicker() {
+        val calendar = Calendar.getInstance()
+
+        binding.editTextUserDob.setOnClickListener {
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedDate = Calendar.getInstance()
+                selectedDate.set(selectedYear, selectedMonth, selectedDay)
+
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val formattedDate = dateFormat.format(selectedDate.time)
+
+                binding.editTextUserDob.setText(formattedDate)
+            }, year, month, day)
+
+            datePickerDialog.show()
+        }
     }
 }
