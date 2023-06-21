@@ -5,7 +5,6 @@ import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.events.ActivityEvent
 import com.ham.activitymonitorapp.events.ActivityEventBus
 import com.ham.activitymonitorapp.events.HeartrateEventBus
-import com.ham.activitymonitorapp.other.Constants.MAX_BPM_GLOBAL
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import kotlinx.coroutines.runBlocking
 
@@ -16,12 +15,6 @@ class ActivityService(private val userViewModel: UserViewModel) {
 
     init {
         subscribeToHeartRateEvent()
-    }
-
-    fun onDestroy() {
-        HeartrateEventBus.unsubscribe {
-
-        }
     }
 
     private fun subscribeToHeartRateEvent() {
@@ -40,7 +33,7 @@ class ActivityService(private val userViewModel: UserViewModel) {
     }
 
     private fun activityClassificator(bpm: Int, user: User) : Activity {
-        val maxBpm = MAX_BPM_GLOBAL - (user.getAge())
+        val maxBpm = user.getMaxBpm()
         val veryLightBpm = maxBpm * Activity.VERY_LIGHT.intensity
         val lightBpm = maxBpm * Activity.LIGHT.intensity
         val moderateBpm = maxBpm * Activity.MODERATE.intensity
