@@ -15,6 +15,7 @@ import com.ham.activitymonitorapp.events.BatteryEventBus
 import com.ham.activitymonitorapp.events.HeartrateEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.sql.Timestamp
 import javax.inject.Inject
 
@@ -26,7 +27,6 @@ class HrViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private lateinit var activeUser: User
-
 
     val currentHrBpm: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
@@ -88,9 +88,9 @@ class HrViewModel @Inject constructor(
             bpm = newHrBpm,
             timestamp = Timestamp(System.currentTimeMillis())
         )
-//        runBlocking {
-//            hrRepository.save(hr)
-//        }
+        runBlocking {
+            hrRepository.save(hr)
+        }
     }
 
     private fun onActivityReceived(newActivity: Activity) {
@@ -99,6 +99,10 @@ class HrViewModel @Inject constructor(
 
     suspend fun getActiveUser(): User {
         return userRepository.getActiveUser()
+    }
+
+    suspend fun getUserListOfHrBpmByUserId(id: Long): List<Int> {
+        return userRepository.getListOfHrBpmByUserId(id)
     }
 
     override fun onCleared() {

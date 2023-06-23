@@ -74,4 +74,10 @@ class UserRepository @Inject constructor(
     suspend fun getUserAndHrs(id: Long): List<UserAndHeartrate> = withContext(Dispatchers.IO) {
         userDao.getUserAndHeartrates(id)
     }
+
+    suspend fun getListOfHrBpmByUserId(id: Long): List<Int> = withContext(Dispatchers.IO) {
+        userDao.getUserAndHeartrates(id).flatMap { userAndHrs ->
+            userAndHrs.heartrates.map { hr -> hr.bpm }
+        }
+    }
 }
