@@ -14,6 +14,10 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.HomeFragmentBinding
@@ -25,6 +29,7 @@ import com.ham.activitymonitorapp.viewmodels.HrViewModel
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import java.util.*
 
 @AndroidEntryPoint
 class HomeFragment: Fragment(R.layout.home_fragment) {
@@ -42,7 +47,14 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private lateinit var activeUser: User
 
+    private lateinit var lineChart: LineChart
+
+    private lateinit var lineDataSet: LineDataSet
+
+    private lateinit var lineData: LineData
+
     private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
+
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -80,9 +92,11 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         if (::activeUser.isInitialized) {
             handleConnect()
             showUsername()
-            observeAndUpdateHrTV()
+            observeHrData()
             observeAndUpdateBatteryTV()
             observeAndUpdateActivityTV()
+            initializeHrGraph()
+
         } else {
             binding.materialSwitch.isEnabled = false
         }
@@ -160,9 +174,10 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         binding.avatarText.text = activeUser.username.substring(0,2)
     }
 
-    private fun observeAndUpdateHrTV() {
+    private fun observeHrData() {
         hrViewModel.currentHrBpm.observe(viewLifecycleOwner) { newHrData ->
             binding.heartRate.text = newHrData.toString()
+            updateChart(getHrListFromActiveUser())
         }
     }
 
@@ -197,6 +212,81 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         stopConnectionAndSetUI()
         activeUser = user
         startConnectionAndSetUI()
+        updateChart(getHrListFromActiveUser())
+    }
+
+    private fun initializeHrGraph() {
+        lineChart = binding.hrGraph
+
+        // chart settings
+        lineChart.setTouchEnabled(true)
+        lineChart.setDrawGridBackground(false)
+        lineChart.legend.isEnabled = false
+        lineChart.description.isEnabled = false
+        lineChart.isDragXEnabled = true
+        lineChart.isDoubleTapToZoomEnabled = false
+
+        // chart xAxis settings
+        val xAxis = lineChart.xAxis
+        xAxis.isEnabled = false
+        xAxis.setDrawGridLines(false)
+        xAxis.granularity = 1f
+
+        // chart yAxis settings
+        lineChart.axisLeft.isEnabled = false
+        lineChart.axisLeft.setDrawGridLines(false)
+        lineChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.red)
+        lineChart.axisRight.textSize = 14f
+
+        setupLineDataSet(null)
+
+        lineData = LineData(lineDataSet)
+        lineChart.data = lineData
+
+        updateChart(getHrListFromActiveUser())
+    }
+
+    private fun updateChart(heartRateData: List<Int>) {
+        lineData.clearValues()
+
+        val entries = mutableListOf<Entry>()
+
+        for (i in heartRateData.indices) {
+            val entry = Entry(i.toFloat(), heartRateData[i].toFloat())
+            entries.add(entry)
+        }
+
+        setupLineDataSet(entries)
+        Log.d(TAG, lineDataSet.toString())
+
+        lineData = LineData(lineDataSet)
+
+        lineData.notifyDataChanged()
+        lineChart.data = lineData
+
+        lineChart.moveViewToX(lineData.xMax)
+        lineChart.setVisibleXRangeMaximum(30f)
+
+        lineChart.notifyDataSetChanged()
+        lineChart.invalidate()
+    }
+
+    private fun getHrListFromActiveUser(): List<Int> {
+        val hrList = runBlocking {
+            hrViewModel.getUserListOfHrBpmByUserId(activeUser.userId)
+        }
+        return hrList
+    }
+
+    private fun setupLineDataSet(yVals: List<Entry>?) {
+        lineDataSet = LineDataSet(yVals, "Heart Rate")
+        lineDataSet.color = ContextCompat.getColor(requireContext(), R.color.red)
+        lineDataSet.setDrawValues(false)
+        lineDataSet.setDrawCircleHole(false)
+        lineDataSet.setDrawCircles(false)
+        lineDataSet.setCircleColor(ContextCompat.getColor(requireContext(), R.color.red))
+        lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        lineDataSet.lineWidth = 1.5f
     }
 
 }
