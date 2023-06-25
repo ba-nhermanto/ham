@@ -21,7 +21,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.HomeFragmentBinding
-import com.ham.activitymonitorapp.events.ActiveUserEventBus
 import com.ham.activitymonitorapp.services.ActivityService
 import com.ham.activitymonitorapp.services.ConnectionService
 import com.ham.activitymonitorapp.services.ServiceRunningChecker
@@ -31,6 +30,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
+/**
+ * TODO:
+ * 1. change usage of activeUser to userViewModel.activeUser
+ */
 @AndroidEntryPoint
 class HomeFragment: Fragment(R.layout.home_fragment) {
     private val userViewModel: UserViewModel by viewModels()
@@ -45,7 +48,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private lateinit var connectionService: ConnectionService
 
-    private lateinit var activeUser: User
+    private var activeUser: User? = null
 
     private lateinit var lineChart: LineChart
 
@@ -87,9 +90,9 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
         getActiveUser()
 
-        subscribeToActiveUser()
+        observeActiveUser()
 
-        if (::activeUser.isInitialized) {
+        if (activeUser != null) {
             handleConnect()
             showUsername()
             showDeviceId()
@@ -107,11 +110,11 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     private fun startConnectionService() {
         val serviceIntent = Intent(requireContext(), ConnectionService::class.java)
 
-        if (!(::activeUser.isInitialized)) {
+        if (activeUser == null) {
             getActiveUser()
         }
 
-        serviceIntent.putExtra("deviceId", activeUser.deviceId)
+        serviceIntent.putExtra("deviceId", activeUser!!.deviceId)
 
         requireContext().startForegroundService(serviceIntent)
     }
@@ -160,7 +163,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     @SuppressLint("SetTextI18n")
     private fun showDeviceId() {
-        binding.connectionDevice.text = "Polar ${activeUser.deviceId}"
+        binding.connectionDevice.text = "Polar ${activeUser!!.deviceId}"
     }
 
     private fun getActiveUser() {
@@ -170,8 +173,8 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     }
 
     private fun showUsername() {
-        binding.username.text = activeUser.username
-        binding.avatarText.text = activeUser.username.substring(0,2)
+        binding.username.text = activeUser!!.username
+        binding.avatarText.text = activeUser!!.username.substring(0,2)
     }
 
     private fun observeHrData() {
@@ -202,9 +205,9 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         }
     }
 
-    private fun subscribeToActiveUser() {
-        ActiveUserEventBus.subscribe { activeUserChangeEvent ->
-            onActiveUserChangeEvent(activeUserChangeEvent.user)
+    private fun observeActiveUser() {
+        userViewModel.activeUser.observe(viewLifecycleOwner) { user ->
+            onActiveUserChangeEvent(user)
         }
     }
 
@@ -273,7 +276,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private fun getHrListFromActiveUser(): List<Int> {
         val hrList = runBlocking {
-            hrViewModel.getUserListOfHrBpmByUserId(activeUser.userId)
+            hrViewModel.getUserListOfHrBpmByUserId(activeUser!!.userId)
         }
         return hrList
     }

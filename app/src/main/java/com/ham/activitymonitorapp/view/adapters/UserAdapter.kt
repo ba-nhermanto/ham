@@ -1,4 +1,4 @@
-package com.ham.activitymonitorapp.view
+package com.ham.activitymonitorapp.view.adapters
 
 import android.view.LayoutInflater
 import android.view.View

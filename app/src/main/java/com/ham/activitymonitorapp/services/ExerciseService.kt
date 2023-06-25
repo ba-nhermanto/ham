@@ -110,11 +110,6 @@ class ExerciseService: Service() {
         activeExercise.done = true
         processExercise()
 
-        runBlocking {
-            val savedEx = exerciseRepository.upsertExercise(activeExercise)
-            Log.d(TAG, "Exercise: ${savedEx.exerciseId} is done = ${savedEx.done}")
-        }
-
         HeartrateEventBus.unsubscribe {
             listOfHr.clear()
         }

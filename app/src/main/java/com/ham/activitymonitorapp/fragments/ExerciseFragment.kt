@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.databinding.ExerciseFragmentBinding
+import com.ham.activitymonitorapp.exceptions.NoActiveUserException
 import com.ham.activitymonitorapp.services.ExerciseService
 import com.ham.activitymonitorapp.viewmodels.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 /**
  * TODO:
  * 1. handle activeUser change -> observe userViewModel.activeUser, if changed stop exercise, get new exerciseList
- * 2. show exercise list -> if clicked show details
+ * 2. show exercise list -> if clicked show details?
  */
 
 @AndroidEntryPoint
@@ -45,6 +47,10 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
         }
     }
 
+    companion object {
+        const val TAG = "EXERCISE_FRAGMENT"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,6 +67,8 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
         handleStopButton()
         enableOrDisableStartAndStopButton()
 
+        binding.includeExerciseStart.buttonStartExercise.isEnabled =
+            exerciseViewModel.activeUser != null
     }
 
     private fun observeAndUpdateExercise() {
@@ -71,13 +79,18 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
     }
 
     private fun startExercise(){
-        exerciseViewModel.createExerciseWithBasicFields()
+        try {
+            exerciseViewModel.createExerciseWithBasicFields()
 
-        val intent = Intent(context, ExerciseService::class.java)
-        intent.putExtra("command", "start")
+            val intent = Intent(context, ExerciseService::class.java)
+            intent.putExtra("command", "start")
 
-        requireContext().startForegroundService(intent)
-        showToast("Exercise started")
+            requireContext().startForegroundService(intent)
+            showToast("Exercise started")
+        } catch (e: NoActiveUserException) {
+            showToast(e.message.toString())
+            Log.e(TAG, e.message.toString())
+        }
     }
 
     private fun bindExerciseService() {

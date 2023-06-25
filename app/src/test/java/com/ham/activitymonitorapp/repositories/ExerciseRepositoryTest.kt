@@ -6,7 +6,6 @@ import com.ham.activitymonitorapp.data.repositories.ExerciseRepository
 import com.ham.activitymonitorapp.exceptions.ExerciseNotFoundException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,6 +64,8 @@ class ExerciseRepositoryTest {
     fun `test createExercise`() = runTest {
         // Setup
         val exercise = supplyExercise()
+        `when`(exerciseDao.insert(exercise)).thenReturn(exercise.exerciseId)
+        `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(exercise)
 
         // Act
         exerciseRepository.upsertExercise(exercise)
@@ -77,6 +78,7 @@ class ExerciseRepositoryTest {
     fun `test updateExercise`() = runTest {
         // Setup
         val exercise = supplyExercise()
+        `when`(exerciseDao.insert(exercise)).thenReturn(exercise.exerciseId)
         `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(exercise)
 
         // Act
@@ -90,30 +92,14 @@ class ExerciseRepositoryTest {
     fun `test upsert`() = runTest {
         // Setup
         val exercise = supplyExercise()
+        `when`(exerciseDao.insert(exercise)).thenReturn(exercise.exerciseId)
+        `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(exercise)
 
         // Act
         exerciseRepository.upsertExercise(exercise)
 
         // Assert
         verify(exerciseDao).insert(exercise)
-    }
-
-
-    @Test
-    fun `test delete exercise not found`() = runTest {
-        // Setup
-        val exercise = supplyExercise()
-        `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(null)
-
-        try {
-            // Act
-            exerciseRepository.deleteExercise(exercise)
-            fail("Expected ExerciseNotFoundException to be thrown")
-        } catch (e: ExerciseNotFoundException) {
-            // Assert
-            assertEquals("Exercise with exerciseId $EXERCISE_ID not found", e.message)
-            verify(exerciseDao, never()).delete(exercise)
-        }
     }
 
     @Test

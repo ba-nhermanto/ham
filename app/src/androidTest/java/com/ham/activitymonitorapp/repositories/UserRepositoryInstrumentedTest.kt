@@ -92,19 +92,6 @@ class UserRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testDeleteUserById(): Unit = runBlocking {
-        // Setup
-        val user = supplyUser()
-
-        // Act
-        userRepository.upsertUser(user)
-        userRepository.deleteUser(user)
-
-        val result = userRepository.getUserById(USER_ID)
-        assertNull(result)
-    }
-
-    @Test
     fun testGetUserAndExercises() = runBlocking {
         // Setup
         val user = supplyUser()

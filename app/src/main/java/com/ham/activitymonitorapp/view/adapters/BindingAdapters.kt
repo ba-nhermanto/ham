@@ -1,4 +1,4 @@
-package com.ham.activitymonitorapp.view
+package com.ham.activitymonitorapp.view.adapters
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter

@@ -49,9 +49,7 @@
                     app:layout_constraintWidth_default="spread"
                     app:layout_constraintHorizontal_chainStyle="spread"
                     app:title="Start"
-                    app:value="@{String.valueOf(exercise.startTime)}">
-
-                </com.ham.activitymonitorapp.view.components.CardExerciseAttributes>
+                    app:value="@{String.valueOf(exercise.startTime)}"/>
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardDuration"
@@ -64,9 +62,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
                     app:title="Duration"
-                    app:value="@{String.format(`%02d:%02d`, exercise.duration / 60, exercise.duration % 60)}">
-
-                </com.ham.activitymonitorapp.view.components.CardExerciseAttributes>
+                    app:value="@{String.format(`%02d:%02d`, exercise.duration / 60, exercise.duration % 60)}"/>
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardCaloriesBurned"
@@ -77,9 +73,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
                     app:title="Calories"
-                    app:value="@{String.valueOf(exercise.caloriesBurned)}">
-
-                </com.ham.activitymonitorapp.view.components.CardExerciseAttributes>
+                    app:value="@{String.valueOf(exercise.caloriesBurned)}"/>
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardAverageHrBpm"
@@ -105,9 +99,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
                     app:title="Max BPM"
-                    app:value="@{String.valueOf(exercise.maxHrBpm)}">
-
-                </com.ham.activitymonitorapp.view.components.CardExerciseAttributes>
+                    app:value="@{String.valueOf(exercise.maxHrBpm)}"/>
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardMinHr"
@@ -118,9 +110,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
                     app:title="Min BPM"
-                    app:value="@{String.valueOf(exercise.minHrBpm)}">
-
-                </com.ham.activitymonitorapp.view.components.CardExerciseAttributes>
+                    app:value="@{String.valueOf(exercise.minHrBpm)}"/>
 
                 <Button
                     android:id="@+id/buttonStartExercise"
