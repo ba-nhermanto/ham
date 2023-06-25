@@ -59,9 +59,9 @@ class ConnectionService : Service() {
     }
 
     companion object {
-        private const val SERVICE_ID = 875642
-        private const val CHANNEL_ID = "channel_id"
-        private const val CHANNEL_NAME = "channel_name"
+        private const val SERVICE_ID = 1
+        private const val CHANNEL_ID = "1"
+        private const val CHANNEL_NAME = "channel_connection_service"
         const val TAG = "ConnectionService"
     }
 

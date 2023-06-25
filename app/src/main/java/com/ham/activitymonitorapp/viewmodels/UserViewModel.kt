@@ -46,12 +46,8 @@ class UserViewModel @Inject constructor(
     suspend fun upsertUser(user: User) {
         try {
             val upserted = userRepository.upsertUser(user)
-            if (upserted != null) {
-                setActiveUser(upserted.userId)
-                showToast("User ${upserted.userId} is saved")
-            } else {
-                Log.e(TAG, "failed to upsert user $user")
-            }
+            setActiveUser(upserted.userId)
+            showToast("User ${upserted.userId} is saved")
         }catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }

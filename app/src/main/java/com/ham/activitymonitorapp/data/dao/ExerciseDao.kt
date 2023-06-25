@@ -14,8 +14,8 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercises WHERE exerciseId IN (:ids)")
     suspend fun loadAllByIds(ids: LongArray): List<Exercise>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg exercises: Exercise)
+    @Query("SELECT * FROM exercises WHERE done = 0")
+    suspend fun getActiveExercise(): Exercise?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     @Transaction
@@ -23,7 +23,4 @@ interface ExerciseDao {
 
     @Delete
     suspend fun delete(exercise: Exercise)
-
-    @Update
-    fun updateExercises(vararg exercise: Exercise)
 }

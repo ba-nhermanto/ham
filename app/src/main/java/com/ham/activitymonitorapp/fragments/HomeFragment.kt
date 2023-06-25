@@ -92,6 +92,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         if (::activeUser.isInitialized) {
             handleConnect()
             showUsername()
+            showDeviceId()
             observeHrData()
             observeAndUpdateBatteryTV()
             observeAndUpdateActivityTV()
@@ -111,7 +112,6 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         }
 
         serviceIntent.putExtra("deviceId", activeUser.deviceId)
-        showDeviceId(activeUser.deviceId)
 
         requireContext().startForegroundService(serviceIntent)
     }
@@ -159,8 +159,8 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showDeviceId(deviceId: String) {
-        binding.connectionDevice.text = "Polar $deviceId"
+    private fun showDeviceId() {
+        binding.connectionDevice.text = "Polar ${activeUser.deviceId}"
     }
 
     private fun getActiveUser() {
