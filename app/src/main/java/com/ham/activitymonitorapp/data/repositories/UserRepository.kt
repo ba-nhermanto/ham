@@ -32,37 +32,15 @@ class UserRepository @Inject constructor(
         userDao.setAllUserInactive()
     }
 
-    suspend fun getUserById(id: Long): User? = withContext(Dispatchers.IO) {
-        userDao.getById(id)
+    suspend fun getUserById(id: Long): User = withContext(Dispatchers.IO) {
+        userDao.getById(id) ?: throw UserNotFoundException(id)
     }
 
     suspend fun deleteUser(user: User) = withContext(Dispatchers.IO) {
-        if (getUserById(user.userId) == null) {
-            throw UserNotFoundException(user.userId)
-        } else {
-            userDao.delete(user)
-        }
+        userDao.delete(user)
     }
 
-    private suspend fun createUser(user: User) = withContext(Dispatchers.IO) {
-        userDao.insertAll(user)
-    }
-
-    private suspend fun updateUser(user: User) = withContext(Dispatchers.IO) {
-        userDao.updateUsers(user)
-    }
-
-    suspend fun createOrUpdateUser(user: User) = withContext(Dispatchers.IO) {
-        val existingUser = getUserById(user.userId)
-
-        if (existingUser == null) {
-            createUser(user)
-        } else {
-            updateUser(user)
-        }
-    }
-
-    suspend fun upsertUser(user: User): User? = withContext(Dispatchers.IO) {
+    suspend fun upsertUser(user: User): User = withContext(Dispatchers.IO) {
         val userId = userDao.insert(user)
         getUserById(userId)
     }

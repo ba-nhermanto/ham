@@ -34,21 +34,6 @@ class ExerciseRepositoryTest {
     }
 
     @Test
-    fun `test setActiveExercise`() = runTest {
-        // Setup
-        val exercise = supplyExercise()
-        `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(exercise)
-
-        // Act
-        val result = exerciseRepository.setActiveExercise(EXERCISE_ID)
-
-        // Assert
-        assertEquals(exercise, result)
-        assertEquals(exercise, exerciseRepository.getActiveExercise())
-        verify(exerciseDao).getById(USER_ID)
-    }
-
-    @Test
     fun `test getAllExercises`() = runTest {
         // Setup
         val exercise = supplyExercise()
@@ -82,10 +67,10 @@ class ExerciseRepositoryTest {
         val exercise = supplyExercise()
 
         // Act
-        exerciseRepository.createExercise(exercise)
+        exerciseRepository.upsertExercise(exercise)
 
         // Assert
-        verify(exerciseDao).insertAll(exercise)
+        verify(exerciseDao).insert(exercise)
     }
 
     @Test
@@ -95,36 +80,10 @@ class ExerciseRepositoryTest {
         `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(exercise)
 
         // Act
-        exerciseRepository.updateExercise(exercise)
+        exerciseRepository.upsertExercise(exercise)
 
         // Assert
-        verify(exerciseDao).updateExercises(exercise)
-    }
-
-    @Test
-    fun `test createOrUpdateExercise when exercise does not exist`() = runTest {
-        // Setup
-        val exercise = supplyExercise()
-        `when`(exerciseDao.getById(exercise.userId)).thenReturn(null)
-
-        // Act
-        exerciseRepository.createOrUpdateExercise(exercise)
-
-        // Assert
-        verify(exerciseDao).insertAll(exercise)
-    }
-
-    @Test
-    fun `test createOrUpdateUser when Exercise exists`() = runTest {
-        // Setup
-        val exercise = supplyExercise()
-        `when`(exerciseDao.getById(EXERCISE_ID)).thenReturn(exercise)
-
-        // Act
-        exerciseRepository.createOrUpdateExercise(exercise)
-
-        // Assert
-        verify(exerciseDao).updateExercises(exercise)
+        verify(exerciseDao).insert(exercise)
     }
 
     @Test

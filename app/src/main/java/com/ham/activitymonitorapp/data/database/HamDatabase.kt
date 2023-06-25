@@ -46,7 +46,6 @@ abstract class HamDatabase: RoomDatabase() {
         // Migration from version 2 to 3
         private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Perform the necessary SQL query to add the new field
                 database.execSQL("ALTER TABLE users ADD COLUMN active INTEGER NOT NULL DEFAULT 0")
             }
         }

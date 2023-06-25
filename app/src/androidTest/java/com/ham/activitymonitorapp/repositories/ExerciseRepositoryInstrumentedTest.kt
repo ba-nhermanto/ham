@@ -49,7 +49,7 @@ class ExerciseRepositoryInstrumentedTest {
         // Setup
         val exercises = supplyListOfExercise()
 
-        exercises.forEach { exerciseRepository.createExercise(it) }
+        exercises.forEach { exerciseRepository.upsertExercise(it) }
 
         // Act
         val result = exerciseRepository.getExercises()
@@ -59,25 +59,10 @@ class ExerciseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testSetAndGetActiveExercise() = runBlocking {
-        // Setup
-        val exercise = supplyExercise()
-        exerciseRepository.createExercise(exercise)
-
-        // Act
-        val result = exerciseRepository.setActiveExercise(exercise.exerciseId)
-        val activeExercise = exerciseRepository.getActiveExercise()
-
-        // Assert
-        assertEquals(exercise, result)
-        assertEquals(exercise, activeExercise)
-    }
-
-    @Test
     fun testGetExerciseById() = runBlocking {
         // Setup
         val exercise = supplyExercise()
-        exerciseRepository.createExercise(exercise)
+        exerciseRepository.upsertExercise(exercise)
 
         // Act
         val result = exerciseRepository.getExerciseById(exercise.exerciseId)
@@ -90,7 +75,7 @@ class ExerciseRepositoryInstrumentedTest {
     fun testGetExercisesById() = runBlocking {
         // Setup
         val exercises = supplyListOfExercise()
-        exercises.forEach { exerciseRepository.createExercise(it) }
+        exercises.forEach { exerciseRepository.upsertExercise(it) }
         val exerciseIds = exercises.map { it.exerciseId }.toLongArray()
 
         // Act
@@ -104,7 +89,7 @@ class ExerciseRepositoryInstrumentedTest {
     fun testDeleteExercise() = runBlocking {
         // Setup
         val exercise = supplyExercise()
-        exerciseRepository.createExercise(exercise)
+        exerciseRepository.upsertExercise(exercise)
 
         // Act
         exerciseRepository.deleteExercise(exercise)
@@ -115,30 +100,17 @@ class ExerciseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testCreateOrUpdateExerciseWhenExerciseDoesNotExist() = runBlocking {
-        // Setup
-        val exercise = supplyExercise()
-
-        // Act
-        exerciseRepository.createOrUpdateExercise(exercise)
-
-        // Assert
-        val result = exerciseRepository.getExerciseById(exercise.exerciseId)
-        assertEquals(exercise, result)
-    }
-
-    @Test
     fun testCreateOrUpdateExerciseWhenExerciseExists() = runBlocking {
         // Setup
         val exercise = supplyExercise()
-        exerciseDao.insertAll(exercise)
+        exerciseDao.insert(exercise)
 
         // Update exercise name
         val updatedExercise = supplyExercise()
         updatedExercise.caloriesBurned = 1000
 
         // Act
-        exerciseRepository.createOrUpdateExercise(updatedExercise)
+        exerciseRepository.upsertExercise(updatedExercise)
 
         // Assert
         val result = exerciseRepository.getExerciseById(exercise.exerciseId)

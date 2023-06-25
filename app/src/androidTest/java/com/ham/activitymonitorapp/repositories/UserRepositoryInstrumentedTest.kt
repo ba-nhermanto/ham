@@ -53,7 +53,7 @@ class UserRepositoryInstrumentedTest {
             User(2, "User 2", 25, Date.valueOf("1990-01-01"), Gender.MALE, DEVICE_ID),
             User(3, "User 3", 30, Date.valueOf("1985-01-01"), Gender.FEMALE, DEVICE_ID)
         )
-        users.forEach { userRepository.createOrUpdateUser(it) }
+        users.forEach { userRepository.upsertUser(it) }
 
         // Act
         val result = userRepository.getUsers()
@@ -68,7 +68,7 @@ class UserRepositoryInstrumentedTest {
         val user = supplyUser()
 
         // Act
-        userRepository.createOrUpdateUser(user)
+        userRepository.upsertUser(user)
 
         // Assert
         val result = userRepository.getUserById(USER_ID)
@@ -83,8 +83,8 @@ class UserRepositoryInstrumentedTest {
         updateUser.weight = 65
 
         // Act
-        userRepository.createOrUpdateUser(user)
-        userRepository.createOrUpdateUser(updateUser)
+        userRepository.upsertUser(user)
+        userRepository.upsertUser(updateUser)
 
         // Assert
         val result = userRepository.getUserById(USER_ID)
@@ -97,7 +97,7 @@ class UserRepositoryInstrumentedTest {
         val user = supplyUser()
 
         // Act
-        userRepository.createOrUpdateUser(user)
+        userRepository.upsertUser(user)
         userRepository.deleteUser(user)
 
         val result = userRepository.getUserById(USER_ID)

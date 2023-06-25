@@ -10,4 +10,20 @@
     <color name="red">#FF4C4C</color>
     <color name="dark_gray">#5A5A5A</color>
 
+    <!-- Light theme colors -->
+    <color name="light_primary">#FFFFFF</color>
+    <color name="light_primary_dark">#F5F5F5</color>
+    <color name="light_accent">#FF4081</color>
+    <color name="light_fa">#fcfcfc</color>
+
+
+    <!-- Dark theme colors -->
+    <color name="dark_primary">#000000</color>
+    <color name="dark_primary_dark">#212121</color>
+    <color name="dark_accent">#FF4081</color>
+
+    <color name="dark_gray_21">#212121</color>
+    <color name="dark_gray_40">#353535</color>
+
+
 </resources>

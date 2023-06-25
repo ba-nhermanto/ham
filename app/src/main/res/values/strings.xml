@@ -29,5 +29,13 @@
     <string name="battery">Battery:</string>
     <string name="activity">Activity: ---</string>
     <string name="heart_rate">Heart Rate</string>
+    <string name="start_exercise">Start exercise</string>
+    <string name="start">start</string>
+    <string name="stop">stop</string>
+    <string name="start_date">Start date</string>
+    <string name="average_bpm">Average Bpm</string>
+    <string name="duration">Duration</string>
+    <string name="max_bpm">Max Bpm</string>
+    <string name="calories_burned">Calories burned</string>
 
 </resources>

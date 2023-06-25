@@ -26,8 +26,11 @@ import java.util.*
 class UserFragment: Fragment(R.layout.user_fragment) {
 
     private val userViewModel: UserViewModel by viewModels()
+
     private var _binding: UserFragmentBinding? = null
+
     private val binding get() = _binding!!
+
     private var activeUser: User? = null
 
     companion object {

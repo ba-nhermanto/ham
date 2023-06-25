@@ -102,10 +102,10 @@ class UserRepositoryTest {
         val user = supplyUser()
 
         // Act
-        userRepository.createOrUpdateUser(user)
+        userRepository.upsertUser(user)
 
         // Assert
-        verify(userDao).insertAll(user)
+        verify(userDao).insert(user)
     }
 
     @Test
@@ -115,36 +115,10 @@ class UserRepositoryTest {
         `when`(userDao.getById(user.userId)).thenReturn(user)
 
         // Act
-        userRepository.createOrUpdateUser(user)
+        userRepository.upsertUser(user)
 
         // Assert
-        verify(userDao).updateUsers(user)
-    }
-
-    @Test
-    fun `test createOrUpdateUser when user does not exist`() = runTest {
-        // Setup
-        val user = supplyUser()
-        `when`(userDao.getById(user.userId)).thenReturn(null)
-
-        // Act
-        userRepository.createOrUpdateUser(user)
-
-        // Assert
-        verify(userDao).insertAll(user)
-    }
-
-    @Test
-    fun `test createOrUpdateUser when user exists`() = runTest {
-        // Setup
-        val user = supplyUser()
-        `when`(userDao.getById(user.userId)).thenReturn(user)
-
-        // Act
-        userRepository.createOrUpdateUser(user)
-
-        // Assert
-        verify(userDao).updateUsers(user)
+        verify(userDao).insert(user)
     }
 
     @Test
