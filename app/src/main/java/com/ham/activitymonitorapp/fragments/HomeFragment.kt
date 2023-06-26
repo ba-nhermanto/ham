@@ -31,10 +31,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
-/**
- * TODO:
- * 1. change usage of activeUser to userViewModel.activeUser
- */
 @AndroidEntryPoint
 class HomeFragment: Fragment(R.layout.home_fragment) {
     private val userViewModel: UserViewModel by viewModels()
@@ -59,14 +55,18 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
 
+    private var connected: Boolean = false
+
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as ConnectionService.ConnectionServiceBinder
             connectionService = binder.getService()
+            connected = true
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
+            connected = false
         }
     }
 
@@ -105,6 +105,8 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         } else {
             binding.materialSwitch.isEnabled = false
         }
+
+        changeConnectedText()
 
     }
 
@@ -219,6 +221,16 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         stopConnectionAndSetUI()
         activeUser = user
         updateChart(getHrListFromActiveUser())
+    }
+
+    private fun changeConnectedText() {
+        if (connected) {
+            binding.connectText.text = resources.getString(R.string.connected)
+            binding.connectText.setTextColor(ContextCompat.getColor(requireContext(), R.color.teal_200))
+        } else {
+            binding.connectText.text = resources.getString(R.string.disconnected)
+            binding.connectText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        }
     }
 
     private fun initializeHrGraph() {

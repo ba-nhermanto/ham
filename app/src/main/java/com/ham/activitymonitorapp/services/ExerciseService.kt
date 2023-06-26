@@ -69,6 +69,8 @@ class ExerciseService: Service() {
     override fun onDestroy() {
         Log.d(TAG, "Stopping exercise")
         stopExercise()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
         super.onDestroy()
     }
 
@@ -116,9 +118,11 @@ class ExerciseService: Service() {
         processExercise()
 
         HeartrateEventBus.unsubscribe {
+            Log.d(TAG, "unsubscribe hr event")
             listOfHr.clear()
         }
 
+        Log.d(TAG, "exercise stopped")
     }
 
     private fun subscribeToHeartRateEvent() {

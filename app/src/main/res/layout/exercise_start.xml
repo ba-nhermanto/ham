@@ -85,7 +85,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
-                    app:title="Average BPM"
+                    app:title="Avg BPM"
                     app:value="@{String.valueOf(exercise.averageHrBpm)}" />
 
 

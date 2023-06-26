@@ -110,7 +110,10 @@ class HrViewModel @Inject constructor(
             currentHrBpm.value = null
         }
         BatteryEventBus.unsubscribe {
-
+        }
+        ActiveUserEventBus.unsubscribe {
+        }
+        ActivityEventBus.unsubscribe {
         }
         super.onCleared()
     }

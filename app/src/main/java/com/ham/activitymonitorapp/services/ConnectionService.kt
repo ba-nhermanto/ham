@@ -211,6 +211,7 @@ class ConnectionService : Service() {
 
         disconnect()
         polarBleApi.shutDown()
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
