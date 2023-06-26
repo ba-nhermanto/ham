@@ -2,6 +2,7 @@ package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,7 @@ import com.ham.activitymonitorapp.data.repositories.ExerciseRepository
 import com.ham.activitymonitorapp.data.repositories.UserRepository
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
 import com.ham.activitymonitorapp.events.ExerciseEventBus
+import com.ham.activitymonitorapp.exceptions.NoActiveUserException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.sql.Timestamp
@@ -23,10 +25,14 @@ class ExerciseViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private lateinit var activeUser: User
+    var activeUser: User? = null
 
     val currentExercise: MutableLiveData<Exercise> by lazy {
         MutableLiveData<Exercise>()
+    }
+
+    val currentExercisesList: MutableLiveData<List<Exercise>> by lazy {
+        MutableLiveData<List<Exercise>>()
     }
 
     companion object {
@@ -36,20 +42,24 @@ class ExerciseViewModel @Inject constructor(
     init {
         subscribeToExerciseEvent()
         subscribeToActiveUserEvent()
+
         viewModelScope.launch {
             activeUser =  getActiveUser()
+            activeUser?.let { getExerciseList(it.userId) }
         }
     }
 
     private fun subscribeToActiveUserEvent() {
         ActiveUserEventBus.subscribe { event ->
             activeUser = event.user
+            getExerciseList(event.user.userId)
         }
     }
 
     private fun subscribeToExerciseEvent() {
         ExerciseEventBus.subscribe { event ->
             onExerciseReceived(event.exercise)
+            activeUser?.let { getExerciseList(it.userId) }
         }
     }
 
@@ -58,13 +68,18 @@ class ExerciseViewModel @Inject constructor(
             val ex = saveExercise(exercise)
             currentExercise.value = ex
             Log.d(TAG, "Exercise is saved: $ex")
+            activeUser?.let { getExerciseList(it.userId) }
         }
     }
 
     fun createExerciseWithBasicFields(): Exercise {
+        if (activeUser == null) {
+            throw NoActiveUserException()
+        }
+
         val exercise = Exercise(
             duration = 0,
-            userId = activeUser.userId,
+            userId = activeUser!!.userId,
             averageHrBpm = 0,
             startTime = Timestamp(System.currentTimeMillis()),
             maxHrBpm = 0,
@@ -81,18 +96,22 @@ class ExerciseViewModel @Inject constructor(
         return exercise
     }
 
+    private fun getExerciseList(id: Long) {
+        viewModelScope.launch {
+            currentExercisesList.value = userRepository.getListOfExercisesByUserId(id)
+        }
+    }
+
     suspend fun getActiveUser(): User {
         return userRepository.getActiveUser()
     }
 
-    suspend fun saveExercise(exercise: Exercise): Exercise {
+    private suspend fun saveExercise(exercise: Exercise): Exercise {
         return exerciseRepository.upsertExercise(exercise)
     }
 
-//    fun validateActiveExercise(): Exercise {
-//        runBlocking {
-//            val exercise = exerciseRepository.getActiveExercise()
-//        }
-//    }
+    private fun showToast(message: String) {
+        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show()
+    }
 
 }

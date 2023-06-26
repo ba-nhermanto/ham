@@ -26,7 +26,7 @@ class HrViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private lateinit var activeUser: User
+    private var activeUser: User? = null
 
     val currentHrBpm: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
@@ -84,7 +84,7 @@ class HrViewModel @Inject constructor(
     private fun onHrReceived(newHrBpm: Int) {
         currentHrBpm.value = newHrBpm
         val hr = Heartrate(
-            userId = activeUser.userId,
+            userId = activeUser!!.userId,
             bpm = newHrBpm,
             timestamp = Timestamp(System.currentTimeMillis())
         )

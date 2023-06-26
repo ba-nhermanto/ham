@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-            name="exercise"
-            type="com.ham.activitymonitorapp.data.entities.Exercise" />
+            name="exerciseList"
+            type="java.util.List&lt;com.ham.activitymonitorapp.data.entities.Exercise&gt;" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

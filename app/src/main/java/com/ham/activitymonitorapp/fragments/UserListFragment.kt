@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.UserListFragmentBinding
-import com.ham.activitymonitorapp.view.UserAdapter
+import com.ham.activitymonitorapp.view.adapters.UserAdapter
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking

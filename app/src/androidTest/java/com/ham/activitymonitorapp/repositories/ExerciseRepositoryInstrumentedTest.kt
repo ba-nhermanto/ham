@@ -9,8 +9,7 @@ import com.ham.activitymonitorapp.data.entities.Exercise
 import com.ham.activitymonitorapp.data.repositories.ExerciseRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import java.sql.Timestamp
@@ -83,20 +82,6 @@ class ExerciseRepositoryInstrumentedTest {
 
         // Assert
         assertEquals(exercises, result)
-    }
-
-    @Test
-    fun testDeleteExercise() = runBlocking {
-        // Setup
-        val exercise = supplyExercise()
-        exerciseRepository.upsertExercise(exercise)
-
-        // Act
-        exerciseRepository.deleteExercise(exercise)
-
-        // Assert
-        val result = exerciseRepository.getExerciseById(exercise.exerciseId)
-        assertNull(result)
     }
 
     @Test

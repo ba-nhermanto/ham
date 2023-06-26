@@ -2,6 +2,7 @@ package com.ham.activitymonitorapp.data.repositories
 
 import androidx.room.Transaction
 import com.ham.activitymonitorapp.data.dao.UserDao
+import com.ham.activitymonitorapp.data.entities.Exercise
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.relationship.UserAndExercise
 import com.ham.activitymonitorapp.data.relationship.UserAndHeartrate
@@ -56,6 +57,13 @@ class UserRepository @Inject constructor(
     suspend fun getListOfHrBpmByUserId(id: Long): List<Int> = withContext(Dispatchers.IO) {
         userDao.getUserAndHeartrates(id).flatMap { userAndHrs ->
             userAndHrs.heartrates.map { hr -> hr.bpm }
+        }
+    }
+
+    suspend fun getListOfExercisesByUserId(id: Long): List<Exercise> = withContext(Dispatchers.IO) {
+        userDao.getUserAndExercises(id).flatMap { userAndExercise ->
+            userAndExercise.exercises
+                .filter { exercise -> exercise.done }
         }
     }
 }

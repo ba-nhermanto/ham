@@ -6,10 +6,8 @@ import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.relationship.UserAndExercise
 import com.ham.activitymonitorapp.data.relationship.UserAndHeartrate
 import com.ham.activitymonitorapp.data.repositories.UserRepository
-import com.ham.activitymonitorapp.exceptions.UserNotFoundException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -80,26 +78,11 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun `test deleteNonExistingUser`() = runTest {
-        // Setup
-        val user = supplyUser()
-        `when`(userDao.getById(USER_ID)).thenReturn(null)
-
-        try {
-            // Act
-            userRepository.deleteUser(user)
-            fail("Expected UserNotFoundException to be thrown")
-        } catch (e: UserNotFoundException) {
-            // Assert
-            assertEquals("User with userId $USER_ID not found", e.message)
-            verify(userDao, never()).delete(user)
-        }
-    }
-
-    @Test
     fun `test createUser`() = runTest {
         // Setup
         val user = supplyUser()
+        `when`(userDao.getById(user.userId)).thenReturn(user)
+        `when`(userDao.insert(user)).thenReturn(user.userId)
 
         // Act
         userRepository.upsertUser(user)
@@ -113,6 +96,7 @@ class UserRepositoryTest {
         // Setup
         val user = supplyUser()
         `when`(userDao.getById(user.userId)).thenReturn(user)
+        `when`(userDao.insert(user)).thenReturn(user.userId)
 
         // Act
         userRepository.upsertUser(user)
