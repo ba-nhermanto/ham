@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             app:cardCornerRadius="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -42,12 +43,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toStartOf="@+id/cardDuration"
+                    app:layout_constraintHorizontal_chainStyle="spread"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
-                    app:layout_constraintHorizontal_chainStyle="spread"
                     app:title="Start"
-                    app:value=""/>
+                    app:value="" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardDuration"
@@ -60,7 +61,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
                     app:title="Duration"
-                    app:value=""/>
+                    app:value="" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardCaloriesBurned"
@@ -71,7 +72,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
                     app:title="Calories"
-                    app:value=""/>
+                    app:value="" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardAverageHrBpm"
@@ -97,7 +98,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
                     app:title="Max BPM"
-                    app:value=""/>
+                    app:value="" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardMinHr"
@@ -108,7 +109,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
                     app:title="Min BPM"
-                    app:value=""/>
+                    app:value="" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

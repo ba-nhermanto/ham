@@ -32,6 +32,13 @@ class UserViewModel @Inject constructor(
     companion object {
         const val TAG = "UserViewModel"
     }
+
+    init {
+        viewModelScope.launch {
+            activeUser.value = getActiveUser()
+        }
+    }
+
     suspend fun setActiveUser(userId: Long) {
         try {
             val au = userRepository.setActiveUser(userId)

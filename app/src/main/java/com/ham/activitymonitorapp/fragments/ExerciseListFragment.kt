@@ -1,6 +1,7 @@
 package com.ham.activitymonitorapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,10 @@ class ExerciseListFragment: Fragment(R.layout.exercise_list_fragment) {
 
     private lateinit var exerciseAdapter: ExerciseAdapter
 
+    companion object {
+        const val TAG = "EXERCISE_LIST_FRAGMENT"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,11 +44,13 @@ class ExerciseListFragment: Fragment(R.layout.exercise_list_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        exerciseViewModel.currentExercisesList.value?.let { initRecyclerView(it) }
         observeExerciseList()
     }
 
     private fun observeExerciseList() {
         exerciseViewModel.currentExercisesList.observe(viewLifecycleOwner) { newExercisesList ->
+            Log.d(TAG, newExercisesList.toString())
             initRecyclerView(newExercisesList)
         }
     }

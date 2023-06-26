@@ -59,7 +59,6 @@ class ExerciseViewModel @Inject constructor(
     private fun subscribeToExerciseEvent() {
         ExerciseEventBus.subscribe { event ->
             onExerciseReceived(event.exercise)
-            activeUser?.let { getExerciseList(it.userId) }
         }
     }
 

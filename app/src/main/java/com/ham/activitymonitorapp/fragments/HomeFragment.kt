@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.HomeFragmentBinding
+import com.ham.activitymonitorapp.events.ActiveUserEventBus
 import com.ham.activitymonitorapp.services.ActivityService
 import com.ham.activitymonitorapp.services.ConnectionService
 import com.ham.activitymonitorapp.services.ServiceRunningChecker
@@ -126,8 +127,8 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private fun stopConnectionService() {
         val serviceIntent = Intent(requireContext(), ConnectionService::class.java)
-        requireContext().stopService(serviceIntent)
         requireContext().unbindService(serviceConnection)
+        requireContext().stopService(serviceIntent)
     }
 
     private fun handleConnect() {
@@ -154,11 +155,13 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     }
 
     private fun stopConnectionAndSetUI() {
-        Log.d(TAG, "stopping connection service")
-        stopConnectionService()
-        binding.materialSwitch.isChecked = false
-        binding.connectText.text = resources.getString(R.string.disconnected)
-        binding.connectText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        if (serviceRunningChecker.isServiceRunning(ConnectionService::class.java, requireContext())) {
+            Log.d(TAG, "stopping connection service")
+            stopConnectionService()
+            binding.materialSwitch.isChecked = false
+            binding.connectText.text = resources.getString(R.string.disconnected)
+            binding.connectText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -206,15 +209,15 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     }
 
     private fun observeActiveUser() {
-        userViewModel.activeUser.observe(viewLifecycleOwner) { user ->
-            onActiveUserChangeEvent(user)
+        ActiveUserEventBus.subscribe { activeUserChangeEvent ->
+            onActiveUserChangeEvent(activeUserChangeEvent.user)
         }
     }
 
     private fun onActiveUserChangeEvent(user: User) {
+        Log.d(TAG, "active user changed")
         stopConnectionAndSetUI()
         activeUser = user
-        startConnectionAndSetUI()
         updateChart(getHrListFromActiveUser())
     }
 

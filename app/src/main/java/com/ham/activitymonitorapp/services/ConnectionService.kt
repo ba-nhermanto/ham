@@ -65,8 +65,12 @@ class ConnectionService : Service() {
         const val TAG = "ConnectionService"
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onCreate() {
+        super.onCreate()
         startForeground(SERVICE_ID, notification())
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
             deviceId = intent.getStringExtra("deviceId").toString()
         }
@@ -203,6 +207,7 @@ class ConnectionService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(TAG, "service stopped")
 
         disconnect()
         polarBleApi.shutDown()
@@ -210,8 +215,6 @@ class ConnectionService : Service() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        disconnect()
-        polarBleApi.shutDown()
         return super.onUnbind(intent)
     }
 

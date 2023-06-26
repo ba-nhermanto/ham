@@ -55,20 +55,25 @@ class ExerciseService: Service() {
         return binder
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onCreate() {
+        super.onCreate()
         startForeground(SERVICE_ID, notification())
+    }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startExercise()
 
         return START_STICKY
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "Stopping exercise")
         stopExercise()
         super.onDestroy()
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        Log.d(TAG, "unbinding service exercise")
         return super.onUnbind(intent)
     }
 

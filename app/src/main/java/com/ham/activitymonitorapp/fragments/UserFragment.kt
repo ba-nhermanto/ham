@@ -53,6 +53,7 @@ class UserFragment: Fragment(R.layout.user_fragment) {
 
         handleButtonUserListOnClick()
         handleButtonSaveUser()
+        handleButtonNewUser()
         handleDatePicker()
 
         this.activeUser = runBlocking{
@@ -70,11 +71,17 @@ class UserFragment: Fragment(R.layout.user_fragment) {
 
     private fun handleButtonSaveUser() {
         binding.buttonSaveUser.setOnClickListener {
-            saveUser()
+            saveUser(false)
         }
     }
 
-    private fun saveUser() {
+    private fun handleButtonNewUser() {
+        binding.buttonNewUser.setOnClickListener {
+            saveUser(true)
+        }
+    }
+
+    private fun saveUser(create: Boolean) {
         val id = binding.textViewUserId.text.toString().toLong()
         val name: String = binding.editTextUserName.text.toString().trim()
         val dob: Date = try {
@@ -87,7 +94,7 @@ class UserFragment: Fragment(R.layout.user_fragment) {
         val weight: Int = binding.editTextUserWeight.text.toString().trim().toInt()
         val deviceId: String = binding.editTextUserDeviceId.text.toString().trim()
 
-        val user = if (id == 0L) {
+        val user = if (create) {
             User(
                 username = name,
                 weight = weight,
@@ -113,7 +120,6 @@ class UserFragment: Fragment(R.layout.user_fragment) {
 
     private fun observeActiveUser() {
         userViewModel.activeUser.observe(viewLifecycleOwner) { user ->
-            Log.d(TAG, user.toString())
             binding.activeUser = user
             this.activeUser = user
         }
