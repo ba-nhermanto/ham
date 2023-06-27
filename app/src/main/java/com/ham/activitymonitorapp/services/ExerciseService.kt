@@ -17,6 +17,7 @@ import com.ham.activitymonitorapp.data.repositories.ExerciseRepository
 import com.ham.activitymonitorapp.data.repositories.UserRepository
 import com.ham.activitymonitorapp.events.ExerciseEvent
 import com.ham.activitymonitorapp.events.ExerciseEventBus
+import com.ham.activitymonitorapp.events.HeartrateEvent
 import com.ham.activitymonitorapp.events.HeartrateEventBus
 import com.ham.activitymonitorapp.exceptions.NoActiveExerciseException
 import com.ham.activitymonitorapp.exceptions.UserNotFoundException
@@ -39,6 +40,10 @@ class ExerciseService: Service() {
     private lateinit var user: User
 
     private lateinit var activeExercise: Exercise
+
+    private val hrListener: (HeartrateEvent) -> Unit = { event ->
+        onHrReceived(event.bpm)
+    }
 
     inner class ExerciseServiceBinder : Binder() {
         fun getService(): ExerciseService = this@ExerciseService
@@ -68,6 +73,7 @@ class ExerciseService: Service() {
 
     override fun onDestroy() {
         Log.d(TAG, "Stopping exercise")
+        listOfHr.clear()
         stopExercise()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
@@ -117,18 +123,13 @@ class ExerciseService: Service() {
         activeExercise.done = true
         processExercise()
 
-        HeartrateEventBus.unsubscribe {
-            Log.d(TAG, "unsubscribe hr event")
-            listOfHr.clear()
-        }
+        HeartrateEventBus.unsubscribe(hrListener)
 
         Log.d(TAG, "exercise stopped")
     }
 
     private fun subscribeToHeartRateEvent() {
-        HeartrateEventBus.subscribe { hrEvent ->
-            onHrReceived(hrEvent.bpm)
-        }
+        HeartrateEventBus.subscribe(hrListener)
     }
 
     private fun onHrReceived(bpm: Int) {

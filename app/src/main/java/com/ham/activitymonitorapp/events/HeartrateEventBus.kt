@@ -8,7 +8,7 @@ object HeartrateEventBus {
     }
 
     fun unsubscribe(listener: (HeartrateEvent) -> Unit) {
-        listeners.removeAll(listeners)
+        listeners.remove(listener)
     }
 
     fun publish(event: HeartrateEvent) {
