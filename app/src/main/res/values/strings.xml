@@ -37,5 +37,7 @@
     <string name="duration">Duration</string>
     <string name="max_bpm">Max Bpm</string>
     <string name="calories_burned">Calories burned</string>
+    <string name="delete_hr_data">delete hr data</string>
+    <string name="delete">delete</string>
 
 </resources>
