@@ -201,10 +201,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
                 android:text="update"
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="@+id/editTextUserDeviceId"
+                app:layout_constraintStart_toEndOf="@+id/buttonStartExercise"
                 app:layout_constraintTop_toBottomOf="@+id/editTextUserDeviceId" />
 
             <Button
@@ -212,7 +214,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="new user"
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="@+id/editTextUserDeviceId"
@@ -233,6 +235,19 @@
                 app:iconTint="@color/teal_200"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/buttonDeleteUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:text="@string/delete"
+                android:textSize="11sp"
+                android:backgroundTint="@color/red_delete"
+                app:layout_constraintEnd_toStartOf="@+id/buttonSaveUser"
+                app:layout_constraintStart_toStartOf="@+id/editTextUserDeviceId"
+                app:layout_constraintTop_toBottomOf="@+id/editTextUserDeviceId" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
