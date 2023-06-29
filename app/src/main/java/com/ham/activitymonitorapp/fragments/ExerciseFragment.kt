@@ -15,16 +15,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.databinding.ExerciseFragmentBinding
+import com.ham.activitymonitorapp.events.ActiveUserEventBus
 import com.ham.activitymonitorapp.exceptions.NoActiveUserException
 import com.ham.activitymonitorapp.services.ExerciseService
+import com.ham.activitymonitorapp.services.ServiceRunningChecker
 import com.ham.activitymonitorapp.viewmodels.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
-
-/**
- * TODO:
- * 1. handle activeUser change -> observe userViewModel.activeUser, if changed stop exercise, get new exerciseList
- * 2. show exercise list -> if clicked show details?
- */
 
 @AndroidEntryPoint
 class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
@@ -36,6 +32,8 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
     private val binding get() = _binding!!
 
     lateinit var exerciseService: ExerciseService
+
+    private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -63,18 +61,30 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeAndUpdateExercise()
+        observeActiveUser()
         handleStartButton()
         handleStopButton()
         enableOrDisableStartAndStopButton()
-
-        binding.includeExerciseStart.buttonStartExercise.isEnabled =
-            exerciseViewModel.activeUser != null
     }
 
     private fun observeAndUpdateExercise() {
         exerciseViewModel.currentExercise.observe(viewLifecycleOwner) { newExercise ->
             binding.includeExerciseStart.exercise = newExercise
             enableOrDisableStartAndStopButton()
+        }
+    }
+
+    private fun observeActiveUser() {
+        ActiveUserEventBus.subscribe {
+            onActiveUserChangeEvent()
+        }
+    }
+
+    private fun onActiveUserChangeEvent() {
+        if (serviceRunningChecker.isServiceRunning(ExerciseService::class.java, requireContext())) {
+            stopExercise()
+            binding.includeExerciseStart.buttonStopExercise.isEnabled = false
+            binding.includeExerciseStart.buttonStartExercise.isEnabled = true
         }
     }
 
@@ -87,9 +97,13 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
             requireContext().startForegroundService(intent)
             showToast("Exercise started")
+            binding.includeExerciseStart.buttonStartExercise.isEnabled = false
+            binding.includeExerciseStart.buttonStopExercise.isEnabled = true
         } catch (e: NoActiveUserException) {
             showToast(e.message.toString())
             Log.e(TAG, e.message.toString())
+            binding.includeExerciseStart.buttonStartExercise.isEnabled = true
+            binding.includeExerciseStart.buttonStopExercise.isEnabled = false
         }
     }
 
@@ -103,14 +117,13 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
         requireContext().unbindService(serviceConnection)
         requireContext().stopService(serviceIntent)
         showToast("Exercise stopped")
+        Log.d(TAG, "Exercise stopped")
     }
 
     private fun handleStartButton() {
         binding.includeExerciseStart.buttonStartExercise.setOnClickListener {
             startExercise()
             bindExerciseService()
-            binding.includeExerciseStart.buttonStartExercise.isEnabled = false
-            binding.includeExerciseStart.buttonStopExercise.isEnabled = true
         }
     }
 

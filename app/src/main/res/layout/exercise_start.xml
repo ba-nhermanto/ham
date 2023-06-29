@@ -18,6 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             app:cardCornerRadius="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -32,24 +33,24 @@
                     android:id="@+id/tvExerciseId"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:text="@string/start_exercise"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:text="@string/start_exercise"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardStartDate"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toStartOf="@+id/cardDuration"
+                    app:layout_constraintHorizontal_chainStyle="spread"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
-                    app:layout_constraintHorizontal_chainStyle="spread"
                     app:title="Start"
-                    app:value="@{String.valueOf(exercise.startTime)}"/>
+                    app:value="@{String.valueOf(exercise.startTime)}" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardDuration"
@@ -62,7 +63,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
                     app:title="Duration"
-                    app:value="@{String.format(`%02d:%02d`, exercise.duration / 60, exercise.duration % 60)}"/>
+                    app:value="@{String.format(`%02d:%02d`, exercise.duration / 60, exercise.duration % 60)}" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardCaloriesBurned"
@@ -73,7 +74,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvExerciseId"
                     app:layout_constraintWidth_default="spread"
                     app:title="Calories"
-                    app:value="@{String.valueOf(exercise.caloriesBurned)}"/>
+                    app:value="@{String.valueOf(exercise.caloriesBurned)}" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardAverageHrBpm"
@@ -84,7 +85,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
-                    app:title="Average BPM"
+                    app:title="Avg BPM"
                     app:value="@{String.valueOf(exercise.averageHrBpm)}" />
 
 
@@ -99,7 +100,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
                     app:title="Max BPM"
-                    app:value="@{String.valueOf(exercise.maxHrBpm)}"/>
+                    app:value="@{String.valueOf(exercise.maxHrBpm)}" />
 
                 <com.ham.activitymonitorapp.view.components.CardExerciseAttributes
                     android:id="@+id/cardMinHr"
@@ -110,7 +111,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cardStartDate"
                     app:layout_constraintWidth_default="spread"
                     app:title="Min BPM"
-                    app:value="@{String.valueOf(exercise.minHrBpm)}"/>
+                    app:value="@{String.valueOf(exercise.minHrBpm)}" />
 
                 <Button
                     android:id="@+id/buttonStartExercise"

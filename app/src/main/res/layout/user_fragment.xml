@@ -64,7 +64,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/id"
                 app:layout_constraintBottom_toTopOf="@+id/name"
-                app:layout_constraintStart_toStartOf="@+id/name" />
+                app:layout_constraintStart_toStartOf="@+id/name"
+                android:visibility="invisible"/>
 
             <TextView
                 android:id="@+id/textViewUserId"
@@ -73,6 +74,7 @@
                 android:text="@{String.valueOf(activeUser.userId)}"
                 app:layout_constraintBottom_toTopOf="@+id/name"
                 app:layout_constraintStart_toEndOf="@+id/textViewId"
+                android:visibility="invisible"
              />
 
             <TextView
@@ -160,6 +162,7 @@
                     android:text="@string/male"
                     android:textSize="11sp"
                     android:layout_marginEnd="16dp"
+                    android:checked="@{activeUser.gender.gender == `male`}"
                     />
 
                 <RadioButton
@@ -168,7 +171,9 @@
                     android:layout_height="wrap_content"
                     android:text="@string/female"
                     android:textSize="11sp"
-                    android:layout_marginStart="16dp"/>
+                    android:layout_marginStart="16dp"
+                    android:checked="@{activeUser.gender.gender == `female`}"
+                    />
 
             </RadioGroup>
 
@@ -197,10 +202,21 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="@string/save_user"
+                android:text="update"
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="@+id/editTextUserDeviceId"
                 app:layout_constraintTop_toBottomOf="@+id/editTextUserDeviceId" />
+
+            <Button
+                android:id="@+id/buttonNewUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="new user"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="@+id/editTextUserDeviceId"
+                app:layout_constraintTop_toBottomOf="@+id/buttonSaveUser" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGoToUserList"
