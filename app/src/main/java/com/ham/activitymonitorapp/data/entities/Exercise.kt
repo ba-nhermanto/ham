@@ -1,16 +1,20 @@
 package com.ham.activitymonitorapp.data.entities
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.ham.activitymonitorapp.data.typeconverters.DateTypeConverter
 import java.sql.Timestamp
 
-@Entity(tableName = "exercises")
+@Entity(tableName = "exercises", foreignKeys = [
+    ForeignKey(
+        entity = User::class,
+        parentColumns = ["userId"],
+        childColumns = ["userId"],
+        onDelete = ForeignKey.CASCADE
+    )
+])
 data class Exercise(
     @PrimaryKey(autoGenerate = true) val exerciseId: Long = 0,
-    @ColumnInfo(name = "userId") val userId: Long,
+    @ColumnInfo(name = "userId", index = true) val userId: Long,
     @TypeConverters(DateTypeConverter::class)
     @ColumnInfo(name = "startTime") val startTime: Timestamp,
     @ColumnInfo(name = "duration") var duration: Int,
