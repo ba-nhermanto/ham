@@ -25,6 +25,7 @@ interface UserDao {
     suspend fun insert(user: User): Long
 
     @Delete
+    @Transaction
     suspend fun delete(user: User)
 
     @Update

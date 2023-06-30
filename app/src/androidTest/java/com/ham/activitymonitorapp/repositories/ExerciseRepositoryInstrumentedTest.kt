@@ -4,18 +4,23 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.ham.activitymonitorapp.data.dao.ExerciseDao
+import com.ham.activitymonitorapp.data.dao.UserDao
 import com.ham.activitymonitorapp.data.database.HamDatabase
 import com.ham.activitymonitorapp.data.entities.Exercise
+import com.ham.activitymonitorapp.data.entities.Gender
+import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.repositories.ExerciseRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.sql.Date
 import java.sql.Timestamp
 
 class ExerciseRepositoryInstrumentedTest {
     private lateinit var exerciseDao: ExerciseDao
+    private lateinit var userDao: UserDao
     private lateinit var exerciseRepository: ExerciseRepository
     private lateinit var database: HamDatabase
 
@@ -29,7 +34,10 @@ class ExerciseRepositoryInstrumentedTest {
             .allowMainThreadQueries()
             .build()
         exerciseDao = database.exerciseDao()
+        userDao = database.userDao()
         exerciseRepository = ExerciseRepository(exerciseDao)
+
+       insertUser()
     }
 
     @After
@@ -41,6 +49,18 @@ class ExerciseRepositoryInstrumentedTest {
     private fun cleanupDb() = runBlocking {
         val exs = exerciseRepository.getExercises()
         exs.forEach { exerciseRepository.deleteExercise(it) }
+    }
+
+    private fun insertUser() = runBlocking {
+        userDao.insert(
+            User(
+                USER_ID,
+                username = "John Doe",
+                weight = 60,
+                dateOfBirth = Date.valueOf("2000-04-30"),
+                deviceId = "DEVICE_ID",
+                gender = Gender.MALE
+        ))
     }
 
     @Test
