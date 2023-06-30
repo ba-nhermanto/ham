@@ -5,8 +5,11 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ham.activitymonitorapp.data.dao.HeartrateDao
+import com.ham.activitymonitorapp.data.dao.UserDao
 import com.ham.activitymonitorapp.data.database.HamDatabase
+import com.ham.activitymonitorapp.data.entities.Gender
 import com.ham.activitymonitorapp.data.entities.Heartrate
+import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.repositories.HeartrateRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -15,12 +18,14 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.sql.Date
 import java.sql.Timestamp
 
 @RunWith(AndroidJUnit4::class)
 class HeartrateRepositoryInstrumentedTest {
 
     private lateinit var hrDao: HeartrateDao
+    private lateinit var userDao: UserDao
     private lateinit var heartrateRepository: HeartrateRepository
     private lateinit var database: HamDatabase
 
@@ -31,7 +36,10 @@ class HeartrateRepositoryInstrumentedTest {
             .allowMainThreadQueries()
             .build()
         hrDao = database.heartrateDao()
+        userDao = database.userDao()
         heartrateRepository = HeartrateRepository(hrDao)
+
+        insertUser()
     }
 
     @After
@@ -43,6 +51,19 @@ class HeartrateRepositoryInstrumentedTest {
     private fun cleanupDb() = runBlocking {
         val hrs = heartrateRepository.getAllHr()
         hrs.forEach { heartrateRepository.deleteHr(it) }
+    }
+
+    private fun insertUser() = runBlocking {
+        userDao.insert(
+            User(
+                1L,
+                username = "John Doe",
+                weight = 60,
+                dateOfBirth = Date.valueOf("2000-04-30"),
+                deviceId = "DEVICE_ID",
+                gender = Gender.MALE
+            )
+        )
     }
 
     @Test
