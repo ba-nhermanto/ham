@@ -10,7 +10,7 @@ import com.ham.activitymonitorapp.fragments.ExerciseFragment
 import com.ham.activitymonitorapp.view.Toaster
 import com.ham.activitymonitorapp.viewmodels.ExerciseViewModel
 
-class ServiceManager {
+class ExerciseServiceManager {
 
     private val toaster: Toaster = Toaster()
 

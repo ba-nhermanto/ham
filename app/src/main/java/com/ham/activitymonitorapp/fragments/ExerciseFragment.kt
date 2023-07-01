@@ -13,7 +13,7 @@ import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.databinding.ExerciseFragmentBinding
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
 import com.ham.activitymonitorapp.services.ExerciseService
-import com.ham.activitymonitorapp.services.ServiceManager
+import com.ham.activitymonitorapp.services.ExerciseServiceManager
 import com.ham.activitymonitorapp.services.ServiceRunningChecker
 import com.ham.activitymonitorapp.viewmodels.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +31,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
 
-    private val serviceManager: ServiceManager = ServiceManager()
+    private val exerciseServiceManager: ExerciseServiceManager = ExerciseServiceManager()
 
     private var connected = false
 
@@ -84,7 +84,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private fun onActiveUserChangeEvent() {
         if (serviceRunningChecker.isServiceRunning(ExerciseService::class.java, requireContext())) {
-            serviceManager.stopExercise(connected, requireContext(), serviceConnection)
+            exerciseServiceManager.stopExercise(connected, requireContext(), serviceConnection)
             binding.includeExerciseStart.buttonStopExercise.isEnabled = false
             binding.includeExerciseStart.buttonStartExercise.isEnabled = true
         }
@@ -92,14 +92,14 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private fun handleStartButton() {
         binding.includeExerciseStart.buttonStartExercise.setOnClickListener {
-            serviceManager.startExercise(exerciseViewModel, requireContext(), binding)
-            serviceManager.bindExerciseService(requireContext(), serviceConnection)
+            exerciseServiceManager.startExercise(exerciseViewModel, requireContext(), binding)
+            exerciseServiceManager.bindExerciseService(requireContext(), serviceConnection)
         }
     }
 
     private fun handleStopButton() {
         binding.includeExerciseStart.buttonStopExercise.setOnClickListener {
-            serviceManager.stopExercise(connected, requireContext(), serviceConnection)
+            exerciseServiceManager.stopExercise(connected, requireContext(), serviceConnection)
             binding.includeExerciseStart.buttonStopExercise.isEnabled = false
             binding.includeExerciseStart.buttonStartExercise.isEnabled = true
         }
