@@ -1,23 +1,19 @@
 package com.ham.activitymonitorapp.fragments
 
 import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.databinding.ExerciseFragmentBinding
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
-import com.ham.activitymonitorapp.exceptions.NoActiveUserException
 import com.ham.activitymonitorapp.services.ExerciseService
+import com.ham.activitymonitorapp.services.ServiceManager
 import com.ham.activitymonitorapp.services.ServiceRunningChecker
 import com.ham.activitymonitorapp.viewmodels.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +30,8 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
     lateinit var exerciseService: ExerciseService
 
     private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
+
+    private val serviceManager: ServiceManager = ServiceManager()
 
     private var connected = false
 
@@ -86,62 +84,22 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private fun onActiveUserChangeEvent() {
         if (serviceRunningChecker.isServiceRunning(ExerciseService::class.java, requireContext())) {
-            stopExercise()
+            serviceManager.stopExercise(connected, requireContext(), serviceConnection)
             binding.includeExerciseStart.buttonStopExercise.isEnabled = false
             binding.includeExerciseStart.buttonStartExercise.isEnabled = true
-        }
-    }
-
-    private fun startExercise(){
-        try {
-            exerciseViewModel.createExerciseWithBasicFields()
-
-            val intent = Intent(context, ExerciseService::class.java)
-            intent.putExtra("command", "start")
-
-            requireContext().startForegroundService(intent)
-            showToast("Exercise started")
-            binding.includeExerciseStart.buttonStartExercise.isEnabled = false
-            binding.includeExerciseStart.buttonStopExercise.isEnabled = true
-        } catch (e: NoActiveUserException) {
-            showToast(e.message.toString())
-            Log.e(TAG, e.message.toString())
-            binding.includeExerciseStart.buttonStartExercise.isEnabled = true
-            binding.includeExerciseStart.buttonStopExercise.isEnabled = false
-        }
-    }
-
-    private fun bindExerciseService() {
-        val serviceIntent = Intent(requireContext(), ExerciseService::class.java)
-        requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-    }
-
-    private fun stopExercise() {
-        if (connected) {
-            try {
-                val serviceIntent = Intent(requireContext(), ExerciseService::class.java)
-                requireContext().unbindService(serviceConnection)
-                requireContext().stopService(serviceIntent)
-                showToast("Exercise stopped")
-                Log.d(TAG, "Exercise stopped")
-            } catch (e: Exception) {
-                Log.e(TAG, "Exercise cannot be stopped")
-            }
-        } else {
-            Log.d(TAG, "No service connection")
         }
     }
 
     private fun handleStartButton() {
         binding.includeExerciseStart.buttonStartExercise.setOnClickListener {
-            startExercise()
-            bindExerciseService()
+            serviceManager.startExercise(exerciseViewModel, requireContext(), binding)
+            serviceManager.bindExerciseService(requireContext(), serviceConnection)
         }
     }
 
     private fun handleStopButton() {
         binding.includeExerciseStart.buttonStopExercise.setOnClickListener {
-            stopExercise()
+            serviceManager.stopExercise(connected, requireContext(), serviceConnection)
             binding.includeExerciseStart.buttonStopExercise.isEnabled = false
             binding.includeExerciseStart.buttonStartExercise.isEnabled = true
         }
@@ -157,7 +115,4 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
         }
     }
 
-    private fun showToast(s: String) {
-        Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT).show()
-    }
 }
