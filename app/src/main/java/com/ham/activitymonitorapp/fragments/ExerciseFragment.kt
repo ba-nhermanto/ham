@@ -35,13 +35,17 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
 
+    private var connected = false
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as ExerciseService.ExerciseServiceBinder
             exerciseService = binder.getService()
+            connected = true
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
+            connected = false
         }
     }
 
@@ -113,11 +117,19 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
     }
 
     private fun stopExercise() {
-        val serviceIntent = Intent(requireContext(), ExerciseService::class.java)
-        requireContext().unbindService(serviceConnection)
-        requireContext().stopService(serviceIntent)
-        showToast("Exercise stopped")
-        Log.d(TAG, "Exercise stopped")
+        if (connected) {
+            try {
+                val serviceIntent = Intent(requireContext(), ExerciseService::class.java)
+                requireContext().unbindService(serviceConnection)
+                requireContext().stopService(serviceIntent)
+                showToast("Exercise stopped")
+                Log.d(TAG, "Exercise stopped")
+            } catch (e: Exception) {
+                Log.e(TAG, "Exercise cannot be stopped")
+            }
+        } else {
+            Log.d(TAG, "No service connection")
+        }
     }
 
     private fun handleStartButton() {
