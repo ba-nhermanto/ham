@@ -4,11 +4,13 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.ham.activitymonitorapp.MainActivity
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.databinding.ExerciseFragmentBinding
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
@@ -27,23 +29,19 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private val binding get() = _binding!!
 
-    lateinit var exerciseService: ExerciseService
+    private var exerciseService: ExerciseService? = null
 
     private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
 
     private val exerciseServiceManager: ExerciseServiceManager = ExerciseServiceManager()
 
-    private var connected = false
-
-    private val serviceConnection = object : ServiceConnection {
+    private var serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as ExerciseService.ExerciseServiceBinder
             exerciseService = binder.getService()
-            connected = true
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            connected = false
         }
     }
 
@@ -83,8 +81,9 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
     }
 
     private fun onActiveUserChangeEvent() {
-        if (serviceRunningChecker.isServiceRunning(ExerciseService::class.java, requireContext())) {
-            exerciseServiceManager.stopExercise(connected, requireContext(), serviceConnection)
+        if (serviceRunningChecker.isServiceRunning(ExerciseService::class.java, (activity as MainActivity))) {
+            Log.d(TAG, "active user is changed, stopping exercise")
+            exerciseServiceManager.stopExercise((activity as MainActivity))
             binding.includeExerciseStart.buttonStopExercise.isEnabled = false
             binding.includeExerciseStart.buttonStartExercise.isEnabled = true
         }
@@ -92,14 +91,13 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private fun handleStartButton() {
         binding.includeExerciseStart.buttonStartExercise.setOnClickListener {
-            exerciseServiceManager.startExercise(exerciseViewModel, requireContext(), binding)
-            exerciseServiceManager.bindExerciseService(requireContext(), serviceConnection)
+            exerciseServiceManager.startExercise(exerciseViewModel, (activity as MainActivity), binding)
         }
     }
 
     private fun handleStopButton() {
         binding.includeExerciseStart.buttonStopExercise.setOnClickListener {
-            exerciseServiceManager.stopExercise(connected, requireContext(), serviceConnection)
+            exerciseServiceManager.stopExercise((activity as MainActivity))
             binding.includeExerciseStart.buttonStopExercise.isEnabled = false
             binding.includeExerciseStart.buttonStartExercise.isEnabled = true
         }

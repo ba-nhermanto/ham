@@ -73,8 +73,8 @@ class ExerciseService: Service() {
 
     override fun onDestroy() {
         Log.d(TAG, "Stopping exercise")
-        listOfHr.clear()
         stopExercise()
+        listOfHr.clear()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
         super.onDestroy()
@@ -120,12 +120,13 @@ class ExerciseService: Service() {
 
 
     private fun stopExercise() {
-        activeExercise.done = true
-        processExercise()
+        runBlocking {
+            activeExercise.done = true
+            HeartrateEventBus.unsubscribe(hrListener)
+            processExerciseAndPublish()
+        }
 
-        HeartrateEventBus.unsubscribe(hrListener)
-
-        Log.d(TAG, "exercise stopped")
+        Log.d(TAG, "exercise stopped: $activeExercise")
     }
 
     private fun subscribeToHeartRateEvent() {
@@ -134,12 +135,17 @@ class ExerciseService: Service() {
 
     private fun onHrReceived(bpm: Int) {
         listOfHr.add(bpm)
-        processExercise()
+        processExerciseAndPublish()
     }
 
     private fun publishExerciseEvent(exercise: Exercise) {
         val event = ExerciseEvent(exercise)
         ExerciseEventBus.publish(event)
+    }
+
+    private fun processExerciseAndPublish() {
+        processExercise()
+        publishExerciseEvent(activeExercise)
     }
 
     private fun processExercise() {
@@ -148,8 +154,12 @@ class ExerciseService: Service() {
         activeExercise.minHrBpm = listOfHr.minOrNull()
         activeExercise.duration = getSecondsBetweenTimestampAndNow(activeExercise.startTime)
         activeExercise.caloriesBurned = calculateCalories(activeExercise).toInt().coerceAtLeast(0)
+
+        runBlocking {
+            exerciseRepository.upsertExercise(activeExercise)
+        }
+
         Log.d(TAG, "updating exercise: $activeExercise")
-        publishExerciseEvent(activeExercise)
     }
 
     private fun getSecondsBetweenTimestampAndNow(timestamp: Timestamp): Int {
