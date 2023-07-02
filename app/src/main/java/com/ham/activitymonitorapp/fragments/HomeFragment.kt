@@ -2,8 +2,6 @@ package com.ham.activitymonitorapp.fragments
 
 import android.annotation.SuppressLint
 import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
@@ -13,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
@@ -22,8 +21,10 @@ import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.HomeFragmentBinding
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
+import com.ham.activitymonitorapp.exceptions.NoActiveUserException
 import com.ham.activitymonitorapp.services.ActivityService
 import com.ham.activitymonitorapp.services.ConnectionService
+import com.ham.activitymonitorapp.services.ConnectionServiceManager
 import com.ham.activitymonitorapp.services.ServiceRunningChecker
 import com.ham.activitymonitorapp.viewmodels.HrViewModel
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
@@ -43,7 +44,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private lateinit var activityService: ActivityService
 
-    private lateinit var connectionService: ConnectionService
+    private var connectionService: ConnectionService? = null
 
     private var activeUser: User? = null
 
@@ -57,6 +58,9 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private var connected: Boolean = false
 
+    private val connectionServiceManager: ConnectionServiceManager = ConnectionServiceManager()
+
+    private lateinit var activity: FragmentActivity
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -82,6 +86,8 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         _binding = HomeFragmentBinding.inflate(inflater, container, false)
 
         activityService = ActivityService(userViewModel)
+
+        activity = requireActivity()
 
         return binding.root
     }
@@ -110,33 +116,10 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     }
 
-    private fun startConnectionService() {
-        val serviceIntent = Intent(requireContext(), ConnectionService::class.java)
-
-        if (activeUser == null) {
-            getActiveUser()
-        }
-
-        serviceIntent.putExtra("deviceId", activeUser!!.deviceId)
-
-        requireContext().startForegroundService(serviceIntent)
-    }
-
-    private fun bindConnectionService() {
-        val serviceIntent = Intent(requireContext(), ConnectionService::class.java)
-        requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-    }
-
-    private fun stopConnectionService() {
-        val serviceIntent = Intent(requireContext(), ConnectionService::class.java)
-        requireContext().unbindService(serviceConnection)
-        requireContext().stopService(serviceIntent)
-    }
-
     private fun handleConnect() {
         binding.materialSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                if (!serviceRunningChecker.isServiceRunning(ConnectionService::class.java, requireContext())) {
+                if (!serviceRunningChecker.isServiceRunning(ConnectionService::class.java, activity)) {
                     startConnectionAndSetUI()
                 } else {
                     Log.d(TAG, "Connection Service is already running")
@@ -149,20 +132,24 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private fun startConnectionAndSetUI() {
         Log.d(TAG, "starting connection service")
-        startConnectionService()
-        bindConnectionService()
+        try {
+            connectionServiceManager.startConnectionService(activity, activeUser!!)
+            connectionServiceManager.bindConnectionService(activity, serviceConnection)
+        } catch (e: NoActiveUserException) {
+            Log.e(TAG, e.message.toString())
+        }
         binding.materialSwitch.isChecked = true
         binding.connectText.text = resources.getString(R.string.connected)
-        binding.connectText.setTextColor(ContextCompat.getColor(requireContext(), R.color.teal_200))
+        binding.connectText.setTextColor(ContextCompat.getColor(activity, R.color.teal_200))
     }
 
     private fun stopConnectionAndSetUI() {
-        if (serviceRunningChecker.isServiceRunning(ConnectionService::class.java, requireContext())) {
+        if (serviceRunningChecker.isServiceRunning(ConnectionService::class.java, activity)) {
             Log.d(TAG, "stopping connection service")
-            stopConnectionService()
+            connectionServiceManager.stopConnectionService(activity, serviceConnection, connected)
             binding.materialSwitch.isChecked = false
             binding.connectText.text = resources.getString(R.string.disconnected)
-            binding.connectText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+            binding.connectText.setTextColor(ContextCompat.getColor(activity, R.color.red))
         }
     }
 

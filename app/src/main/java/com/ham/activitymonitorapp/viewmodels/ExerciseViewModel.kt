@@ -1,7 +1,6 @@
 package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -64,9 +63,7 @@ class ExerciseViewModel @Inject constructor(
 
     private fun onExerciseReceived(exercise: Exercise) {
         viewModelScope.launch {
-            val ex = saveExercise(exercise)
-            currentExercise.value = ex
-            Log.d(TAG, "Exercise is saved: $ex")
+            currentExercise.value = exercise
             activeUser?.let { getExerciseList(it.userId) }
         }
     }

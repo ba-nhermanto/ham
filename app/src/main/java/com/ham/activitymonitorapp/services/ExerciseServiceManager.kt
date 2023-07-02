@@ -2,7 +2,6 @@ package com.ham.activitymonitorapp.services
 
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.util.Log
 import com.ham.activitymonitorapp.databinding.ExerciseFragmentBinding
 import com.ham.activitymonitorapp.exceptions.NoActiveUserException
@@ -14,19 +13,14 @@ class ExerciseServiceManager {
 
     private val toaster: Toaster = Toaster()
 
-    fun stopExercise(connected: Boolean, context: Context, serviceConnection: ServiceConnection) {
-        if (connected) {
-            try {
-                val serviceIntent = Intent(context, ExerciseService::class.java)
-                context.unbindService(serviceConnection)
-                context.stopService(serviceIntent)
-                toaster.showToast("Exercise stopped", context)
-                Log.d(ExerciseFragment.TAG, "Exercise stopped")
-            } catch (e: Exception) {
-                Log.e(ExerciseFragment.TAG, "Exercise cannot be stopped")
-            }
-        } else {
-            Log.d(ExerciseFragment.TAG, "No service connection")
+    fun stopExercise(context: Context) {
+        try {
+            val serviceIntent = Intent(context, ExerciseService::class.java)
+            context.stopService(serviceIntent)
+            toaster.showToast("Exercise stopped", context)
+            Log.d(ExerciseFragment.TAG, "Exercise stopped")
+        } catch (e: Exception) {
+            Log.e(ExerciseFragment.TAG, "Exercise cannot be stopped: ${e.message.toString()}")
         }
     }
 
@@ -49,8 +43,4 @@ class ExerciseServiceManager {
         }
     }
 
-    fun bindExerciseService(context: Context, serviceConnection: ServiceConnection) {
-        val serviceIntent = Intent(context, ExerciseService::class.java)
-        context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-    }
 }
