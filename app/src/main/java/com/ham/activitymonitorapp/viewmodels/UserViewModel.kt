@@ -2,7 +2,6 @@ package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -10,6 +9,7 @@ import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.repositories.UserRepository
 import com.ham.activitymonitorapp.events.ActiveUserChangeEvent
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
+import com.ham.activitymonitorapp.view.Toaster
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,13 +29,20 @@ class UserViewModel @Inject constructor(
         MutableLiveData<User>()
     }
 
+    private val toaster = Toaster()
+
     companion object {
         const val TAG = "UserViewModel"
     }
 
     init {
         viewModelScope.launch {
-            activeUser.value = getActiveUser()
+            if (!activeUser.isInitialized) {
+                Log.d(TAG, "getting active user")
+                activeUser.value = getActiveUser()
+            }
+
+            Log.d(TAG, "active user: ${activeUser.value}")
         }
     }
 
@@ -44,7 +51,7 @@ class UserViewModel @Inject constructor(
             val au = userRepository.setActiveUser(userId)
             activeUser.value = au
             publishActiveUser(au)
-            showToast("User ${au.userId} is active")
+            toaster.showToast("User ${au.userId} is active", getApplication())
         } catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -54,7 +61,7 @@ class UserViewModel @Inject constructor(
         try {
             val upserted = userRepository.upsertUser(user)
             setActiveUser(upserted.userId)
-            showToast("User ${upserted.userId} is saved")
+            toaster.showToast("User ${upserted.userId} is saved", getApplication())
         }catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -71,11 +78,40 @@ class UserViewModel @Inject constructor(
         return userRepository.getActiveUser()
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show()
+    suspend fun deleteActiveUser() {
+        var deleted = false
+        activeUser.value?.let {
+            try {
+                deleted = deleteUser(it)
+            } catch (e: Exception) {
+                Log.e(TAG, e.message.toString())
+                toaster.showToast("please stop running exercise", getApplication())
+            }
+
+            if (deleted) {
+                try {
+                    setActiveUser(userRepository.getUsers()[0].userId)
+                } catch (e: Exception) {
+                    Log.e(TAG, e.message.toString())
+                    Log.d(TAG, "no users in the database")
+                    activeUser.value = null
+                    publishActiveUser(null)
+                }
+            }
+        }
     }
 
-    private fun publishActiveUser(user: User) {
+    private suspend fun deleteUser(user: User): Boolean {
+        val activeExercise = userRepository.getActiveExerciseByUserId(user.userId)
+        if (activeExercise.isEmpty()) {
+            userRepository.deleteUser(user)
+            return true
+        } else {
+            throw Exception("user: ${user.userId} has active exercise: $activeExercise")
+        }
+    }
+
+    private fun publishActiveUser(user: User?) {
         ActiveUserEventBus.publish(
             ActiveUserChangeEvent(user)
         )

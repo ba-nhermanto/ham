@@ -14,6 +14,7 @@ import com.ham.activitymonitorapp.databinding.ExerciseListFragmentBinding
 import com.ham.activitymonitorapp.view.adapters.ExerciseAdapter
 import com.ham.activitymonitorapp.viewmodels.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class ExerciseListFragment: Fragment(R.layout.exercise_list_fragment) {
@@ -43,6 +44,10 @@ class ExerciseListFragment: Fragment(R.layout.exercise_list_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        runBlocking {
+            exerciseViewModel.setActiveUser()
+            exerciseViewModel.setExerciseList()
+        }
         exerciseViewModel.currentExercisesList.value?.let { initRecyclerView(it) }
         observeExerciseList()
     }

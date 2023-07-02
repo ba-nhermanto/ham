@@ -52,6 +52,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
         runBlocking {
             exerciseViewModel.setActiveUser()
+            exerciseViewModel.setExerciseList()
         }
 
         observeAndUpdateExercise()
@@ -70,6 +71,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private fun observeActiveUser() {
         ActiveUserEventBus.subscribe {
+            Log.d(TAG, "user change event received: ${it.user}")
             onActiveUserChangeEvent()
         }
     }
@@ -85,6 +87,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
                 Log.e(TAG, e.message.toString())
             }
         }
+        binding.includeExerciseStart.exercise = null
     }
 
     private fun handleStartButton() {

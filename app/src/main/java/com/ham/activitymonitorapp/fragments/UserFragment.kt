@@ -54,6 +54,7 @@ class UserFragment: Fragment(R.layout.user_fragment) {
         handleButtonUserListOnClick()
         handleButtonSaveUser()
         handleButtonNewUser()
+        handleButtonDeleteUser()
         handleDatePicker()
 
         this.activeUser = runBlocking{
@@ -78,6 +79,12 @@ class UserFragment: Fragment(R.layout.user_fragment) {
     private fun handleButtonNewUser() {
         binding.buttonNewUser.setOnClickListener {
             saveUser(true)
+        }
+    }
+
+    private fun handleButtonDeleteUser() {
+        binding.buttonDeleteUser.setOnClickListener {
+            deleteActiveUser()
         }
     }
 
@@ -123,7 +130,6 @@ class UserFragment: Fragment(R.layout.user_fragment) {
             binding.activeUser = user
             this.activeUser = user
         }
-
     }
 
     private fun handleDatePicker() {
@@ -145,6 +151,12 @@ class UserFragment: Fragment(R.layout.user_fragment) {
             }, year, month, day)
 
             datePickerDialog.show()
+        }
+    }
+
+    private fun deleteActiveUser() {
+        runBlocking {
+            userViewModel.deleteActiveUser()
         }
     }
 }

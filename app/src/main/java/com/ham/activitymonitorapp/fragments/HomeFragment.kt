@@ -199,7 +199,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private fun observeActiveUser() {
         ActiveUserEventBus.subscribe { activeUserChangeEvent ->
-            onActiveUserChangeEvent(activeUserChangeEvent.user)
+            activeUserChangeEvent.user?.let { onActiveUserChangeEvent(it) }
         }
     }
 

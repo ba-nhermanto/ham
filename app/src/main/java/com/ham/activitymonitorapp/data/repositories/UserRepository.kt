@@ -60,10 +60,17 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getListOfExercisesByUserId(id: Long): List<Exercise> = withContext(Dispatchers.IO) {
+    suspend fun getListOfDoneExercisesByUserId(id: Long): List<Exercise> = withContext(Dispatchers.IO) {
         userDao.getUserAndExercises(id).flatMap { userAndExercise ->
             userAndExercise.exercises
                 .filter { exercise -> exercise.done }
+        }
+    }
+
+    suspend fun getActiveExerciseByUserId(id: Long): List<Exercise> = withContext(Dispatchers.IO) {
+        userDao.getUserAndExercises(id).flatMap { userAndExercise ->
+            userAndExercise.exercises
+                .filter { exercise -> !exercise.done }
         }
     }
 }
