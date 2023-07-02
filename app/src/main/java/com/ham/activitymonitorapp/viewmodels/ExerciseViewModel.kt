@@ -2,7 +2,6 @@ package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -44,7 +43,8 @@ class ExerciseViewModel @Inject constructor(
         subscribeToActiveUserEvent()
 
         viewModelScope.launch {
-            activeUser =  getActiveUser()
+            Log.d(TAG, "getting active user and related exercises")
+            setActiveUser()
             activeUser?.let { getExerciseList(it.userId) }
         }
     }
@@ -100,8 +100,9 @@ class ExerciseViewModel @Inject constructor(
         }
     }
 
-    suspend fun getActiveUser(): User {
-        return userRepository.getActiveUser()
+    suspend fun setActiveUser() {
+        activeUser = userRepository.getActiveUser()
+        Log.d(TAG, "found user: $activeUser")
     }
 
     private suspend fun saveExercise(exercise: Exercise): Exercise {
