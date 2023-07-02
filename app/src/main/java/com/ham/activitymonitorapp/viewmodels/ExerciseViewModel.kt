@@ -1,6 +1,7 @@
 package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -50,6 +51,7 @@ class ExerciseViewModel @Inject constructor(
 
     private fun subscribeToActiveUserEvent() {
         ActiveUserEventBus.subscribe { event ->
+            Log.d(TAG, "user change event received: ${event.user}")
             activeUser = event.user
             getExerciseList(event.user.userId)
         }
@@ -104,10 +106,6 @@ class ExerciseViewModel @Inject constructor(
 
     private suspend fun saveExercise(exercise: Exercise): Exercise {
         return exerciseRepository.upsertExercise(exercise)
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show()
     }
 
 }

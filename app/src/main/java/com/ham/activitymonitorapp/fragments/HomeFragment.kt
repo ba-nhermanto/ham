@@ -204,7 +204,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     }
 
     private fun onActiveUserChangeEvent(user: User) {
-        Log.d(TAG, "active user changed")
+        Log.d(TAG, "active user changed: $user")
         stopConnectionAndSetUI()
         activeUser = user
         updateChart(getHrListFromActiveUser())
