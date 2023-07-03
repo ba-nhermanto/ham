@@ -13,7 +13,9 @@ import com.ham.activitymonitorapp.services.ConnectionService
 import com.ham.activitymonitorapp.services.ServiceRunningChecker
 import com.ham.activitymonitorapp.view.Toaster
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -89,7 +91,9 @@ class UserViewModel @Inject constructor(
                 deleted = deleteUser(it)
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
-                toaster.showToast(e.message.toString(), getApplication())
+                withContext(Dispatchers.Main) {
+                    toaster.showToast(e.message.toString(), getApplication())
+                }
             }
 
             if (deleted) {
@@ -99,7 +103,7 @@ class UserViewModel @Inject constructor(
                 } catch (e: Exception) {
                     Log.e(TAG, e.message.toString())
                     Log.d(TAG, "no users in the database")
-                    activeUser.value = null
+                    activeUser.postValue(null)
                     publishActiveUser(null)
                 }
             }
@@ -110,7 +114,7 @@ class UserViewModel @Inject constructor(
         val activeExercise = userRepository.getActiveExerciseByUserId(user.userId)
 
         if (serviceRunningChecker.isServiceRunning(ConnectionService::class.java, getApplication())) {
-            throw Exception("user has active connection to hr sensor")
+            throw Exception("user has active hr sensor connection")
         }
 
         if (activeExercise.isEmpty()) {
