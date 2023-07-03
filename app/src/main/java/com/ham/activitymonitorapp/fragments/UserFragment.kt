@@ -8,15 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.Gender
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.UserFragmentBinding
 import com.ham.activitymonitorapp.other.Constants.DEFAULT_DATE
+import com.ham.activitymonitorapp.view.Toaster
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,6 +34,8 @@ class UserFragment: Fragment(R.layout.user_fragment) {
     private val binding get() = _binding!!
 
     private var activeUser: User? = null
+
+    private val toaster = Toaster()
 
     companion object {
         const val TAG = "USER_FRAGMENT"
@@ -120,9 +124,13 @@ class UserFragment: Fragment(R.layout.user_fragment) {
             )
         }
 
-        runBlocking {
-            userViewModel.upsertUser(user)
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                userViewModel.upsertUser(user)
+            }
         }
+
+        toaster.showToast("User is saved", context!!)
     }
 
     private fun observeActiveUser() {
@@ -155,8 +163,10 @@ class UserFragment: Fragment(R.layout.user_fragment) {
     }
 
     private fun deleteActiveUser() {
-        runBlocking {
-            userViewModel.deleteActiveUser()
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                userViewModel.deleteActiveUser()
+            }
         }
     }
 }

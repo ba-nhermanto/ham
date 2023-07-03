@@ -135,6 +135,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         try {
             connectionServiceManager.startConnectionService(activity, activeUser!!)
             connectionServiceManager.bindConnectionService(activity, serviceConnection)
+            connected = true
         } catch (e: NoActiveUserException) {
             Log.e(TAG, e.message.toString())
         }
@@ -147,6 +148,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         if (serviceRunningChecker.isServiceRunning(ConnectionService::class.java, activity)) {
             Log.d(TAG, "stopping connection service")
             connectionServiceManager.stopConnectionService(activity, serviceConnection, connected)
+            connected = false
             binding.materialSwitch.isChecked = false
             binding.connectText.text = resources.getString(R.string.disconnected)
             binding.connectText.setTextColor(ContextCompat.getColor(activity, R.color.red))
@@ -278,7 +280,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private fun getHrListFromActiveUser(): List<Int> {
         val hrList = runBlocking {
-            hrViewModel.getUserListOfHrBpmByUserId(activeUser!!.userId)
+            hrViewModel.getListOfHrBpmByUserId(activeUser!!.userId)
         }
         return hrList
     }

@@ -68,6 +68,7 @@ class ConnectionService : Service() {
     override fun onCreate() {
         super.onCreate()
         startForeground(SERVICE_ID, notification())
+        appContext = applicationContext
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -75,9 +76,8 @@ class ConnectionService : Service() {
             deviceId = intent.getStringExtra("deviceId").toString()
         }
 
-        appContext = baseContext
-        connectPolar(deviceId)
         setPolarApiCallback()
+        connectPolar(deviceId)
         listenHrBroadcast()
 
         return super.onStartCommand(intent, flags, startId)
@@ -89,6 +89,7 @@ class ConnectionService : Service() {
 
             deviceConnected = try {
                 connectToDevice(polarId)
+                Log.d(TAG, "connected to $polarId")
                 true
             } catch (polarInvalidArgument: PolarInvalidArgument) {
                 Log.e(TAG, "Failed to connect. Reason $polarInvalidArgument ")

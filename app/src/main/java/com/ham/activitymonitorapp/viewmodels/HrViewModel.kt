@@ -14,8 +14,9 @@ import com.ham.activitymonitorapp.events.ActivityEventBus
 import com.ham.activitymonitorapp.events.BatteryEventBus
 import com.ham.activitymonitorapp.events.HeartrateEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.sql.Timestamp
 import javax.inject.Inject
 
@@ -49,7 +50,6 @@ class HrViewModel @Inject constructor(
         viewModelScope.launch {
             activeUser =  getActiveUser()
         }
-
     }
 
     private fun subscribeToHeartRateEvent() {
@@ -88,8 +88,10 @@ class HrViewModel @Inject constructor(
             bpm = newHrBpm,
             timestamp = Timestamp(System.currentTimeMillis())
         )
-        runBlocking {
-            hrRepository.save(hr)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                hrRepository.save(hr)
+            }
         }
     }
 
@@ -101,7 +103,7 @@ class HrViewModel @Inject constructor(
         return userRepository.getActiveUser()
     }
 
-    suspend fun getUserListOfHrBpmByUserId(id: Long): List<Int> {
+    suspend fun getListOfHrBpmByUserId(id: Long): List<Int> {
         return userRepository.getListOfHrBpmByUserId(id)
     }
 

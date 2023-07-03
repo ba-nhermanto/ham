@@ -9,6 +9,8 @@ import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.data.repositories.UserRepository
 import com.ham.activitymonitorapp.events.ActiveUserChangeEvent
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
+import com.ham.activitymonitorapp.services.ConnectionService
+import com.ham.activitymonitorapp.services.ServiceRunningChecker
 import com.ham.activitymonitorapp.view.Toaster
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -31,6 +33,8 @@ class UserViewModel @Inject constructor(
 
     private val toaster = Toaster()
 
+    private val serviceRunningChecker = ServiceRunningChecker()
+
     companion object {
         const val TAG = "UserViewModel"
     }
@@ -49,7 +53,7 @@ class UserViewModel @Inject constructor(
     suspend fun setActiveUser(userId: Long) {
         try {
             val au = userRepository.setActiveUser(userId)
-            activeUser.value = au
+            activeUser.postValue(au)
             publishActiveUser(au)
             toaster.showToast("User ${au.userId} is active", getApplication())
         } catch (e: Exception) {
@@ -61,7 +65,7 @@ class UserViewModel @Inject constructor(
         try {
             val upserted = userRepository.upsertUser(user)
             setActiveUser(upserted.userId)
-            toaster.showToast("User ${upserted.userId} is saved", getApplication())
+            Log.d(TAG, "user is saved: $upserted")
         }catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -85,11 +89,12 @@ class UserViewModel @Inject constructor(
                 deleted = deleteUser(it)
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
-                toaster.showToast("please stop running exercise", getApplication())
+                toaster.showToast(e.message.toString(), getApplication())
             }
 
             if (deleted) {
                 try {
+                    Log.d(TAG, "user has been successfully deleted")
                     setActiveUser(userRepository.getUsers()[0].userId)
                 } catch (e: Exception) {
                     Log.e(TAG, e.message.toString())
@@ -103,6 +108,11 @@ class UserViewModel @Inject constructor(
 
     private suspend fun deleteUser(user: User): Boolean {
         val activeExercise = userRepository.getActiveExerciseByUserId(user.userId)
+
+        if (serviceRunningChecker.isServiceRunning(ConnectionService::class.java, getApplication())) {
+            throw Exception("user has active connection to hr sensor")
+        }
+
         if (activeExercise.isEmpty()) {
             userRepository.deleteUser(user)
             return true
