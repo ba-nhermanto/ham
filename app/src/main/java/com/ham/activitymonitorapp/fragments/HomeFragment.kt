@@ -89,10 +89,6 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         getActiveUser()
 
         observeActiveUser()
-//        hrViewModel.initActiveUserAndListHr()
-//
-//        runBlocking {
-//        }
 
         if (activeUser != null) {
             Log.d(TAG, "home fragment init")
