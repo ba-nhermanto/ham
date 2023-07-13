@@ -38,7 +38,7 @@ class UserViewModel @Inject constructor(
     private val serviceRunningChecker = ServiceRunningChecker()
 
     companion object {
-        const val TAG = "UserViewModel"
+        const val TAG = "USER_VIEW_MODEL"
     }
 
     init {
@@ -54,12 +54,14 @@ class UserViewModel @Inject constructor(
 
     suspend fun setActiveUser(userId: Long) {
         try {
+            Log.d(TAG, "Setting user: $userId active")
             val au = userRepository.setActiveUser(userId)
             activeUser.postValue(au)
-            publishActiveUser(au)
             withContext(Dispatchers.Main){
+                publishActiveUser(au)
                 toaster.showToast("User ${au.userId} is active", getApplication())
             }
+            Log.d(TAG, "User ${au.userId} is active")
         } catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -128,6 +130,7 @@ class UserViewModel @Inject constructor(
     }
 
     private fun publishActiveUser(user: User?) {
+        Log.d(TAG, "Publishing active user: ${user?.userId}")
         ActiveUserEventBus.publish(
             ActiveUserChangeEvent(user)
         )
