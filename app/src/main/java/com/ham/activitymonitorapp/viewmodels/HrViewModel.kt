@@ -80,7 +80,7 @@ class HrViewModel @Inject constructor(
 
     private fun subscribeToActiveUserEvent() {
         ActiveUserEventBus.subscribe { event ->
-            Log.d(TAG, "user changed: ${event.user}")
+            Log.d(TAG, "user changed: ${event.user?.userId}")
             activeUser = event.user
             viewModelScope.launch {
                 currentHrList.value = withContext(Dispatchers.IO) {
@@ -130,7 +130,7 @@ class HrViewModel @Inject constructor(
     fun initActiveUserAndListHr() {
         runBlocking {
             activeUser =  getActiveUser()
-            Log.d(TAG, "active user: $activeUser")
+            Log.d(TAG, "active user: ${activeUser?.userId}")
             activeUser?.let {
                 currentHrList.value = getListOfHrBpmByUserId(activeUser!!.userId)
             }

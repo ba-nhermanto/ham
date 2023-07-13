@@ -48,7 +48,7 @@ class UserViewModel @Inject constructor(
                 activeUser.value = getActiveUser()
             }
 
-            Log.d(TAG, "active user: ${activeUser.value}")
+            Log.d(TAG, "active user: ${activeUser.value?.userId}")
         }
     }
 
@@ -57,7 +57,9 @@ class UserViewModel @Inject constructor(
             val au = userRepository.setActiveUser(userId)
             activeUser.postValue(au)
             publishActiveUser(au)
-            toaster.showToast("User ${au.userId} is active", getApplication()) // TODO: run this on main thread
+            withContext(Dispatchers.Main){
+                toaster.showToast("User ${au.userId} is active", getApplication())
+            }
         } catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -67,7 +69,7 @@ class UserViewModel @Inject constructor(
         try {
             val upserted = userRepository.upsertUser(user)
             setActiveUser(upserted.userId)
-            Log.d(TAG, "user is saved: $upserted")
+            Log.d(TAG, "user is saved: ${upserted.userId}")
         }catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -117,12 +119,12 @@ class UserViewModel @Inject constructor(
             throw Exception("user has active hr sensor connection")
         }
 
-        if (activeExercise.isEmpty()) {
-            userRepository.deleteUser(user)
-            return true
-        } else {
+        if (activeExercise.isNotEmpty()) {
             throw Exception("user: ${user.userId} has active exercise: $activeExercise")
         }
+
+        userRepository.deleteUser(user)
+        return true
     }
 
     private fun publishActiveUser(user: User?) {

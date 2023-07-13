@@ -156,7 +156,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         activeUser = runBlocking {
             userViewModel.getActiveUser()
         }
-        Log.d(TAG, "active user: $activeUser")
+        Log.d(TAG, "active user: ${activeUser?.userId}")
     }
 
     private fun showUsername() {
@@ -198,7 +198,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     }
 
     private fun onActiveUserChangeEvent(user: User) {
-        Log.d(TAG, "active user changed: $user")
+        Log.d(TAG, "active user changed: ${user.userId}")
         stopConnectionAndSetUI()
         activeUser = user
         graphService.initializeHrGraph()

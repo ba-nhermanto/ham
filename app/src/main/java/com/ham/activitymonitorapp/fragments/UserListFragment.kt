@@ -55,7 +55,7 @@ class UserListFragment: Fragment(R.layout.user_list_fragment) {
     private fun showListOfUsers() {
         userViewModel.users.observe(viewLifecycleOwner) { users ->
             initRecyclerView(users)
-            Log.d(tag, users.toString())
+            Log.d(tag, users.map{user -> user.userId}.toString())
         }
     }
 

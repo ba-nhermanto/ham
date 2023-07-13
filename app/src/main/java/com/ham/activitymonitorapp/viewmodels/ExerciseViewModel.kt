@@ -45,14 +45,13 @@ class ExerciseViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d(TAG, "getting active user and related exercises")
             setActiveUser()
-            setExerciseList()
+            initExerciseList()
         }
     }
 
     private fun subscribeToActiveUserEvent() {
         ActiveUserEventBus.subscribe { event ->
-            // TODO: remove user details
-            Log.d(TAG, "user change event received: ${event.user}")
+            Log.d(TAG, "user change event received: ${event.user?.userId}")
 
             if (event.user == null) {
                 currentExercisesList.value = listOf()
@@ -74,7 +73,6 @@ class ExerciseViewModel @Inject constructor(
     private fun onExerciseReceived(exercise: Exercise) {
         viewModelScope.launch {
             currentExercise.value = exercise
-            // TODO: do not get from repo?
             activeUser?.let { getExerciseList(it.userId) }
         }
     }
@@ -105,18 +103,18 @@ class ExerciseViewModel @Inject constructor(
 
     private fun getExerciseList(id: Long) {
         viewModelScope.launch {
+            Log.d(TAG, "getting list of exercises")
             currentExercisesList.value = userRepository.getListOfDoneExercisesByUserId(id)
         }
     }
 
-    fun setExerciseList() {
+    fun initExerciseList() {
         activeUser?.let { getExerciseList(it.userId) }
     }
 
     suspend fun setActiveUser() {
         activeUser = userRepository.getActiveUser()
-        // TODO: remove log user details
-        Log.d(TAG, "found user: $activeUser")
+        Log.d(TAG, "found user: ${activeUser?.userId}")
     }
 
 }
