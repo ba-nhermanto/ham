@@ -22,6 +22,9 @@ import com.ham.activitymonitorapp.events.HeartrateEventBus
 import com.ham.activitymonitorapp.exceptions.NoActiveExerciseException
 import com.ham.activitymonitorapp.exceptions.UserNotFoundException
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.sql.Timestamp
 import javax.inject.Inject
@@ -155,7 +158,7 @@ class ExerciseService: Service() {
         activeExercise.duration = getSecondsBetweenTimestampAndNow(activeExercise.startTime)
         activeExercise.caloriesBurned = calculateCalories(activeExercise).toInt().coerceAtLeast(0)
 
-        runBlocking {
+        CoroutineScope(Dispatchers.IO).launch {
             exerciseRepository.upsertExercise(activeExercise)
         }
 

@@ -13,19 +13,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.data.entities.User
 import com.ham.activitymonitorapp.databinding.HomeFragmentBinding
 import com.ham.activitymonitorapp.events.ActiveUserEventBus
 import com.ham.activitymonitorapp.exceptions.NoActiveUserException
-import com.ham.activitymonitorapp.services.ActivityService
-import com.ham.activitymonitorapp.services.ConnectionService
-import com.ham.activitymonitorapp.services.ConnectionServiceManager
-import com.ham.activitymonitorapp.services.ServiceRunningChecker
+import com.ham.activitymonitorapp.services.*
 import com.ham.activitymonitorapp.viewmodels.HrViewModel
 import com.ham.activitymonitorapp.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,12 +41,6 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private var activeUser: User? = null
 
-    private lateinit var lineChart: LineChart
-
-    private lateinit var lineDataSet: LineDataSet
-
-    private lateinit var lineData: LineData
-
     private val serviceRunningChecker: ServiceRunningChecker = ServiceRunningChecker()
 
     private var connected: Boolean = false
@@ -61,6 +48,8 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     private val connectionServiceManager: ConnectionServiceManager = ConnectionServiceManager()
 
     private lateinit var activity: FragmentActivity
+
+    private lateinit var graphService: GraphService
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -89,6 +78,8 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
         activity = requireActivity()
 
+        graphService = GraphService(binding, hrViewModel, activity, viewLifecycleOwner)
+
         return binding.root
     }
 
@@ -100,14 +91,15 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         observeActiveUser()
 
         if (activeUser != null) {
+            Log.d(TAG, "home fragment init")
             handleConnect()
             showUsername()
             showDeviceId()
             observeHrData()
             observeAndUpdateBatteryTV()
             observeAndUpdateActivityTV()
-            initializeHrGraph()
-
+            graphService.initializeHrGraph()
+            graphService.observeHr()
         } else {
             binding.materialSwitch.isEnabled = false
         }
@@ -135,6 +127,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         try {
             connectionServiceManager.startConnectionService(activity, activeUser!!)
             connectionServiceManager.bindConnectionService(activity, serviceConnection)
+            connected = true
         } catch (e: NoActiveUserException) {
             Log.e(TAG, e.message.toString())
         }
@@ -147,6 +140,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         if (serviceRunningChecker.isServiceRunning(ConnectionService::class.java, activity)) {
             Log.d(TAG, "stopping connection service")
             connectionServiceManager.stopConnectionService(activity, serviceConnection, connected)
+            connected = false
             binding.materialSwitch.isChecked = false
             binding.connectText.text = resources.getString(R.string.disconnected)
             binding.connectText.setTextColor(ContextCompat.getColor(activity, R.color.red))
@@ -162,6 +156,7 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
         activeUser = runBlocking {
             userViewModel.getActiveUser()
         }
+        Log.d(TAG, "active user: $activeUser")
     }
 
     private fun showUsername() {
@@ -172,7 +167,6 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
     private fun observeHrData() {
         hrViewModel.currentHrBpm.observe(viewLifecycleOwner) { newHrData ->
             binding.heartRate.text = newHrData.toString()
-            updateChart(getHrListFromActiveUser())
         }
     }
 
@@ -199,15 +193,15 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
 
     private fun observeActiveUser() {
         ActiveUserEventBus.subscribe { activeUserChangeEvent ->
-            onActiveUserChangeEvent(activeUserChangeEvent.user)
+            activeUserChangeEvent.user?.let { onActiveUserChangeEvent(it) }
         }
     }
 
     private fun onActiveUserChangeEvent(user: User) {
-        Log.d(TAG, "active user changed")
+        Log.d(TAG, "active user changed: $user")
         stopConnectionAndSetUI()
         activeUser = user
-        updateChart(getHrListFromActiveUser())
+        graphService.initializeHrGraph()
     }
 
     private fun changeConnectedText() {
@@ -218,80 +212,6 @@ class HomeFragment: Fragment(R.layout.home_fragment) {
             binding.connectText.text = resources.getString(R.string.disconnected)
             binding.connectText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
         }
-    }
-
-    private fun initializeHrGraph() {
-        lineChart = binding.hrGraph
-
-        // chart settings
-        lineChart.setTouchEnabled(true)
-        lineChart.setDrawGridBackground(false)
-        lineChart.legend.isEnabled = false
-        lineChart.description.isEnabled = false
-        lineChart.isDragXEnabled = true
-        lineChart.isDoubleTapToZoomEnabled = false
-
-        // chart xAxis settings
-        val xAxis = lineChart.xAxis
-        xAxis.isEnabled = false
-        xAxis.setDrawGridLines(false)
-        xAxis.granularity = 1f
-
-        // chart yAxis settings
-        lineChart.axisLeft.isEnabled = false
-        lineChart.axisLeft.setDrawGridLines(false)
-        lineChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.red)
-        lineChart.axisRight.textSize = 14f
-
-        setupLineDataSet(null)
-
-        lineData = LineData(lineDataSet)
-        lineChart.data = lineData
-
-        updateChart(getHrListFromActiveUser())
-    }
-
-    private fun updateChart(heartRateData: List<Int>) {
-        lineData.clearValues()
-
-        val entries = mutableListOf<Entry>()
-
-        for (i in heartRateData.indices) {
-            val entry = Entry(i.toFloat(), heartRateData[i].toFloat())
-            entries.add(entry)
-        }
-
-        setupLineDataSet(entries)
-        Log.d(TAG, lineDataSet.toString())
-
-        lineData = LineData(lineDataSet)
-
-        lineData.notifyDataChanged()
-        lineChart.data = lineData
-
-        lineChart.moveViewToX(lineData.xMax)
-        lineChart.setVisibleXRangeMaximum(30f)
-
-        lineChart.notifyDataSetChanged()
-        lineChart.invalidate()
-    }
-
-    private fun getHrListFromActiveUser(): List<Int> {
-        val hrList = runBlocking {
-            hrViewModel.getUserListOfHrBpmByUserId(activeUser!!.userId)
-        }
-        return hrList
-    }
-
-    private fun setupLineDataSet(yVals: List<Entry>?) {
-        lineDataSet = LineDataSet(yVals, "Heart Rate")
-        lineDataSet.color = ContextCompat.getColor(requireContext(), R.color.red)
-        lineDataSet.setDrawValues(false)
-        lineDataSet.setDrawCircleHole(false)
-        lineDataSet.setDrawCircles(false)
-        lineDataSet.setCircleColor(ContextCompat.getColor(requireContext(), R.color.red))
-        lineDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-        lineDataSet.lineWidth = 1.5f
     }
 
 }

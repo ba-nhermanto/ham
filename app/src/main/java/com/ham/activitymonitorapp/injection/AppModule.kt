@@ -30,21 +30,5 @@ class AppModule {
     @Singleton
     @Provides
     fun provideHeartrateDao(db: HamDatabase) = db.heartrateDao()
-//
-//    @Singleton
-//    @Provides
-//    fun provideExerciseRepository(dao: ExerciseDao): ExerciseRepository {
-//        return ExerciseRepository(dao)
-//    }
-//
-//    @Singleton
-//    @Provides
-//    fun provideUserRepository(dao: UserDao): UserRepository {
-//        return UserRepository(dao)
-//    }
 
-//    @Provides
-//    fun provideExerciseRepository(dao: ExerciseDao): ExerciseRepository {
-//        return ExerciseRepository(dao)
-//    }
 }

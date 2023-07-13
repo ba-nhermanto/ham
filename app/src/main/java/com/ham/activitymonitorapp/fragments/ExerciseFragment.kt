@@ -16,6 +16,7 @@ import com.ham.activitymonitorapp.services.ExerciseServiceManager
 import com.ham.activitymonitorapp.services.ServiceRunningChecker
 import com.ham.activitymonitorapp.viewmodels.ExerciseViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
@@ -48,6 +49,12 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        runBlocking {
+            exerciseViewModel.setActiveUser()
+            exerciseViewModel.setExerciseList()
+        }
+
         observeAndUpdateExercise()
         observeActiveUser()
         handleStartButton()
@@ -64,6 +71,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private fun observeActiveUser() {
         ActiveUserEventBus.subscribe {
+            Log.d(TAG, "user change event received: ${it.user}")
             onActiveUserChangeEvent()
         }
     }
@@ -79,6 +87,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
                 Log.e(TAG, e.message.toString())
             }
         }
+        binding.includeExerciseStart.exercise = null
     }
 
     private fun handleStartButton() {

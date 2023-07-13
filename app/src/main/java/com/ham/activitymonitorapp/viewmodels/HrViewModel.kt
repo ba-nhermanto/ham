@@ -1,6 +1,7 @@
 package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,8 +15,10 @@ import com.ham.activitymonitorapp.events.ActivityEventBus
 import com.ham.activitymonitorapp.events.BatteryEventBus
 import com.ham.activitymonitorapp.events.HeartrateEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.sql.Timestamp
 import javax.inject.Inject
 
@@ -26,7 +29,7 @@ class HrViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private var activeUser: User? = null
+    var activeUser: User? = null
 
     val currentHrBpm: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
@@ -40,16 +43,21 @@ class HrViewModel @Inject constructor(
         MutableLiveData<Boolean>()
     }
 
+    val currentHrList: MutableLiveData<List<Int>> by lazy {
+        MutableLiveData<List<Int>>()
+    }
+
+    companion object {
+        const val TAG = "HR_VIEW_MODEL"
+    }
+
 
     init {
         subscribeToHeartRateEvent()
         subscribeToBatteryEvent()
         subscribeToActivityEvent()
         subscribeToActiveUserEvent()
-        viewModelScope.launch {
-            activeUser =  getActiveUser()
-        }
-
+        initActiveUserAndListHr()
     }
 
     private fun subscribeToHeartRateEvent() {
@@ -72,7 +80,13 @@ class HrViewModel @Inject constructor(
 
     private fun subscribeToActiveUserEvent() {
         ActiveUserEventBus.subscribe { event ->
+            Log.d(TAG, "user changed: ${event.user}")
             activeUser = event.user
+            viewModelScope.launch {
+                currentHrList.value = withContext(Dispatchers.IO) {
+                    activeUser?.let { getListOfHrBpmByUserId(it.userId) }
+                }
+            }
         }
     }
 
@@ -82,15 +96,23 @@ class HrViewModel @Inject constructor(
     }
 
     private fun onHrReceived(newHrBpm: Int) {
+        Log.d(TAG, "new hr data received = $newHrBpm")
         currentHrBpm.value = newHrBpm
         val hr = Heartrate(
             userId = activeUser!!.userId,
             bpm = newHrBpm,
             timestamp = Timestamp(System.currentTimeMillis())
         )
-        runBlocking {
-            hrRepository.save(hr)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                hrRepository.save(hr)
+            }
         }
+
+        val temp = currentHrList.value?.toMutableList()
+        temp?.add(newHrBpm)
+        currentHrList.value = temp?.toList()
+        Log.d(TAG, "hr list modified = ${currentHrList.value}")
     }
 
     private fun onActivityReceived(newActivity: Activity) {
@@ -101,8 +123,18 @@ class HrViewModel @Inject constructor(
         return userRepository.getActiveUser()
     }
 
-    suspend fun getUserListOfHrBpmByUserId(id: Long): List<Int> {
+    suspend fun getListOfHrBpmByUserId(id: Long): List<Int> {
         return userRepository.getListOfHrBpmByUserId(id)
+    }
+
+    fun initActiveUserAndListHr() {
+        runBlocking {
+            activeUser =  getActiveUser()
+            Log.d(TAG, "active user: $activeUser")
+            activeUser?.let {
+                currentHrList.value = getListOfHrBpmByUserId(activeUser!!.userId)
+            }
+        }
     }
 
     override fun onCleared() {

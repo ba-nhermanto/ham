@@ -1,7 +1,7 @@
 package com.ham.activitymonitorapp.viewmodels
 
 import android.app.Application
-import android.widget.Toast
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -43,15 +43,25 @@ class ExerciseViewModel @Inject constructor(
         subscribeToActiveUserEvent()
 
         viewModelScope.launch {
-            activeUser =  getActiveUser()
-            activeUser?.let { getExerciseList(it.userId) }
+            Log.d(TAG, "getting active user and related exercises")
+            setActiveUser()
+            setExerciseList()
         }
     }
 
     private fun subscribeToActiveUserEvent() {
         ActiveUserEventBus.subscribe { event ->
+            // TODO: remove user details
+            Log.d(TAG, "user change event received: ${event.user}")
+
+            if (event.user == null) {
+                currentExercisesList.value = listOf()
+            } else {
+                getExerciseList(event.user.userId)
+            }
+
             activeUser = event.user
-            getExerciseList(event.user.userId)
+            currentExercise.value = null
         }
     }
 
@@ -64,6 +74,7 @@ class ExerciseViewModel @Inject constructor(
     private fun onExerciseReceived(exercise: Exercise) {
         viewModelScope.launch {
             currentExercise.value = exercise
+            // TODO: do not get from repo?
             activeUser?.let { getExerciseList(it.userId) }
         }
     }
@@ -86,7 +97,7 @@ class ExerciseViewModel @Inject constructor(
         currentExercise.value = exercise
 
         viewModelScope.launch {
-            saveExercise(exercise)
+            exerciseRepository.upsertExercise(exercise)
         }
 
         return exercise
@@ -94,20 +105,18 @@ class ExerciseViewModel @Inject constructor(
 
     private fun getExerciseList(id: Long) {
         viewModelScope.launch {
-            currentExercisesList.value = userRepository.getListOfExercisesByUserId(id)
+            currentExercisesList.value = userRepository.getListOfDoneExercisesByUserId(id)
         }
     }
 
-    suspend fun getActiveUser(): User {
-        return userRepository.getActiveUser()
+    fun setExerciseList() {
+        activeUser?.let { getExerciseList(it.userId) }
     }
 
-    private suspend fun saveExercise(exercise: Exercise): Exercise {
-        return exerciseRepository.upsertExercise(exercise)
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show()
+    suspend fun setActiveUser() {
+        activeUser = userRepository.getActiveUser()
+        // TODO: remove log user details
+        Log.d(TAG, "found user: $activeUser")
     }
 
 }
