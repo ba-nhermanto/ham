@@ -130,7 +130,7 @@ class UserFragment: Fragment(R.layout.user_fragment) {
             }
         }
 
-        toaster.showToast("User is saved", context!!)
+        toaster.showToast("User is saved", requireContext())
     }
 
     private fun observeActiveUser() {

@@ -57,7 +57,7 @@ class UserViewModel @Inject constructor(
             val au = userRepository.setActiveUser(userId)
             activeUser.postValue(au)
             publishActiveUser(au)
-            toaster.showToast("User ${au.userId} is active", getApplication())
+            toaster.showToast("User ${au.userId} is active", getApplication()) // TODO: run this on main thread
         } catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
