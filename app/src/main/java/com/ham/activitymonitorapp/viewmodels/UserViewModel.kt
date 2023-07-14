@@ -38,7 +38,7 @@ class UserViewModel @Inject constructor(
     private val serviceRunningChecker = ServiceRunningChecker()
 
     companion object {
-        const val TAG = "UserViewModel"
+        const val TAG = "USER_VIEW_MODEL"
     }
 
     init {
@@ -48,16 +48,20 @@ class UserViewModel @Inject constructor(
                 activeUser.value = getActiveUser()
             }
 
-            Log.d(TAG, "active user: ${activeUser.value}")
+            Log.d(TAG, "active user: ${activeUser.value?.userId}")
         }
     }
 
     suspend fun setActiveUser(userId: Long) {
         try {
+            Log.d(TAG, "Setting user: $userId active")
             val au = userRepository.setActiveUser(userId)
             activeUser.postValue(au)
-            publishActiveUser(au)
-            toaster.showToast("User ${au.userId} is active", getApplication()) // TODO: run this on main thread
+            withContext(Dispatchers.Main){
+                publishActiveUser(au)
+                toaster.showToast("User ${au.userId} is active", getApplication())
+            }
+            Log.d(TAG, "User ${au.userId} is active")
         } catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -67,7 +71,7 @@ class UserViewModel @Inject constructor(
         try {
             val upserted = userRepository.upsertUser(user)
             setActiveUser(upserted.userId)
-            Log.d(TAG, "user is saved: $upserted")
+            Log.d(TAG, "user is saved: ${upserted.userId}")
         }catch (e: Exception) {
             e.message?.let { Log.e(TAG, it) }
         }
@@ -117,15 +121,16 @@ class UserViewModel @Inject constructor(
             throw Exception("user has active hr sensor connection")
         }
 
-        if (activeExercise.isEmpty()) {
-            userRepository.deleteUser(user)
-            return true
-        } else {
+        if (activeExercise.isNotEmpty()) {
             throw Exception("user: ${user.userId} has active exercise: $activeExercise")
         }
+
+        userRepository.deleteUser(user)
+        return true
     }
 
     private fun publishActiveUser(user: User?) {
+        Log.d(TAG, "Publishing active user: ${user?.userId}")
         ActiveUserEventBus.publish(
             ActiveUserChangeEvent(user)
         )

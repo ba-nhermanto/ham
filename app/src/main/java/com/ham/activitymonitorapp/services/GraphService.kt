@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -12,8 +11,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.ham.activitymonitorapp.R
 import com.ham.activitymonitorapp.databinding.HomeFragmentBinding
 import com.ham.activitymonitorapp.viewmodels.HrViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class GraphService constructor(
@@ -68,38 +65,10 @@ class GraphService constructor(
         lineChart.data = lineData
     }
 
-    fun updateChart(heartRateData: List<Int>) {
-        viewLifeCycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            val entries = heartRateData.mapIndexed { index, value ->
-                Entry(index.toFloat(), value.toFloat())
-            }
-
-            lineData.clearValues()
-
-            setupLineDataSet(entries)
-
-            lineData.addDataSet(lineDataSet)
-
-            lineChart.data = lineData
-
-            lineChart.moveViewToX(lineData.xMax)
-            lineChart.setVisibleXRangeMaximum(30f)
-
-            lineChart.invalidate()
-        }
-    }
-
-    fun observeHrList() {
-        hrViewModel.currentHrList.observe(viewLifeCycleOwner) {
-            Log.d(TAG, "current hr list changed: $it")
-            updateChart(it.toList())
-        }
-    }
-
     fun observeHr() {
         hrViewModel.currentHrBpm.observe(viewLifeCycleOwner) {
             Log.d(TAG, "received new HR: $it, updating graph entry")
-            addNewHeartEntry(it)
+            addNewHeartRateDataEntry(it)
         }
     }
 
@@ -118,7 +87,7 @@ class GraphService constructor(
         return lineDataSet
     }
 
-    private fun addNewHeartEntry(heartRate: Int) {
+    private fun addNewHeartRateDataEntry(heartRate: Int) {
         val data: LineData = lineChart.data
         val set = data.getDataSetByIndex(0)
         data.addEntry(Entry(set.entryCount.toFloat(), heartRate.toFloat()), 0)

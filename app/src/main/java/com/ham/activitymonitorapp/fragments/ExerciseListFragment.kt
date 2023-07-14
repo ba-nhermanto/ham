@@ -46,7 +46,7 @@ class ExerciseListFragment: Fragment(R.layout.exercise_list_fragment) {
         super.onViewCreated(view, savedInstanceState)
         runBlocking {
             exerciseViewModel.setActiveUser()
-            exerciseViewModel.setExerciseList()
+            exerciseViewModel.initExerciseList()
         }
         exerciseViewModel.currentExercisesList.value?.let { initRecyclerView(it) }
         observeExerciseList()

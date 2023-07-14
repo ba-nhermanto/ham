@@ -52,7 +52,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
         runBlocking {
             exerciseViewModel.setActiveUser()
-            exerciseViewModel.setExerciseList()
+            exerciseViewModel.initExerciseList()
         }
 
         observeAndUpdateExercise()
@@ -71,7 +71,7 @@ class ExerciseFragment: Fragment(R.layout.exercise_fragment) {
 
     private fun observeActiveUser() {
         ActiveUserEventBus.subscribe {
-            Log.d(TAG, "user change event received: ${it.user}")
+            Log.d(TAG, "user change event received: ${it.user?.userId}")
             onActiveUserChangeEvent()
         }
     }
