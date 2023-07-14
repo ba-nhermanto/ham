@@ -54,13 +54,13 @@ class ExerciseViewModel @Inject constructor(
             Log.d(TAG, "user change event received: ${event.user?.userId}")
 
             if (event.user == null) {
-                currentExercisesList.value = listOf()
+                currentExercisesList.postValue(listOf())
             } else {
                 getExerciseList(event.user.userId)
             }
 
             activeUser = event.user
-            currentExercise.value = null
+            currentExercise.postValue(null)
         }
     }
 
