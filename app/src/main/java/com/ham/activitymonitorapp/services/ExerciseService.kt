@@ -123,11 +123,11 @@ class ExerciseService: Service() {
 
 
     private fun stopExercise() {
-        runBlocking {
-            activeExercise.done = true
-            HeartrateEventBus.unsubscribe(hrListener)
-            processExerciseAndPublish()
-        }
+        activeExercise.done = true
+        HeartrateEventBus.unsubscribe(hrListener)
+        processExercise()
+        saveActiveExercise()
+        publishExerciseEvent(activeExercise)
 
         Log.d(TAG, "exercise stopped: $activeExercise")
     }
@@ -138,17 +138,13 @@ class ExerciseService: Service() {
 
     private fun onHrReceived(bpm: Int) {
         listOfHr.add(bpm)
-        processExerciseAndPublish()
+        processExercise()
+        publishExerciseEvent(activeExercise)
     }
 
     private fun publishExerciseEvent(exercise: Exercise) {
         val event = ExerciseEvent(exercise)
         ExerciseEventBus.publish(event)
-    }
-
-    private fun processExerciseAndPublish() {
-        processExercise()
-        publishExerciseEvent(activeExercise)
     }
 
     private fun processExercise() {
@@ -157,10 +153,6 @@ class ExerciseService: Service() {
         activeExercise.minHrBpm = listOfHr.minOrNull()
         activeExercise.duration = getSecondsBetweenTimestampAndNow(activeExercise.startTime)
         activeExercise.caloriesBurned = calculateCalories(activeExercise).toInt().coerceAtLeast(0)
-
-        CoroutineScope(Dispatchers.IO).launch {
-            exerciseRepository.upsertExercise(activeExercise)
-        }
 
         Log.d(TAG, "updating exercise: $activeExercise")
     }
@@ -189,6 +181,13 @@ class ExerciseService: Service() {
             Log.d(TAG, e.message.toString())
             showToast(e.message.toString())
         }
+    }
+
+    private fun saveActiveExercise(){
+        CoroutineScope(Dispatchers.IO).launch {
+            exerciseRepository.upsertExercise(activeExercise)
+        }
+        Log.d(TAG, "Exercise: ${activeExercise.exerciseId} is saved")
     }
 
     private fun showToast(message: String) {

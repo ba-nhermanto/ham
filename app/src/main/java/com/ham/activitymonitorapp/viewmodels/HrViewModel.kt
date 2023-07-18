@@ -112,7 +112,6 @@ class HrViewModel @Inject constructor(
         val temp = currentHrList.value?.toMutableList()
         temp?.add(newHrBpm)
         currentHrList.value = temp?.toList()
-        Log.d(TAG, "hr list modified = ${currentHrList.value}")
     }
 
     private fun onActivityReceived(newActivity: Activity) {
