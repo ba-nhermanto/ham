@@ -102,8 +102,23 @@ class UserFragment: Fragment(R.layout.user_fragment) {
             Date.valueOf(DEFAULT_DATE)
         }
         val gender: Gender = if (binding.radioButtonMale.isChecked) Gender.MALE else Gender.FEMALE
-        val weight: Int = binding.editTextUserWeight.text.toString().trim().toInt()
+        val weight: Int? = binding.editTextUserWeight.text.toString().trim().toIntOrNull()
         val deviceId: String = binding.editTextUserDeviceId.text.toString().trim()
+
+        if (name.isEmpty()) {
+            toaster.showToast("Please enter user name", requireContext())
+            return
+        }
+
+        if (weight == null) {
+            toaster.showToast("Please enter valid user data", requireContext())
+            return
+        }
+
+        if (deviceId.isEmpty()) {
+            toaster.showToast("Please enter device id", requireContext())
+            return
+        }
 
         val user = if (create) {
             User(
